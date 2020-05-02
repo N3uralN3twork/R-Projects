@@ -8,7 +8,7 @@ output:
     math:  mathjax
 ---
 ```{r Introduction, results='hide', echo = TRUE, warning=FALSE, include=FALSE}
-setwd("C:/Users/MatthiasQ.MATTQ/Desktop/R Projects")
+setwd("C:/Users/miqui/OneDrive/R Projects")
 library(rsample)
 library(dplyr)
 library(caret)
