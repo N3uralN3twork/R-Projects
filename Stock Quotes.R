@@ -30,9 +30,12 @@ Quotes$Weekday = weekdays(as.Date(Quotes$`Trade Time`))
 
 "Create an excel workbook"
 #Can change in the future if needed
-file = "C:/Users/MatthiasQ.MATTQ/Desktop/R Projects/Quotes.xlsx"
+file = "C:/Users/miqui/OneDrive/R Projects/Quotes.xlsx"
 
 
 write.xlsx(Quotes, file = file, sheetName = "Quotes",
            col.names = TRUE, row.names = TRUE, append = FALSE)
 #This took like 40 minutes to build lol.
+
+
+
