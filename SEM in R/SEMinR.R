@@ -22,7 +22,8 @@ summary(dataset)
 attach(dataset)
 
 dataset$MSA97 = as.character(dataset$MSA97)
-
+dataset$gender <- as.character(dataset$gender)
+table(dataset$gender) #3,393 0's and 3,342 1's
 ######  MODEL ###### 
 
 Model1 <- '
@@ -62,16 +63,19 @@ HIGHSCHOOL  =~
 
 
 adultincarceration ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + HIGHSCHOOL + juvenileincarceration + CRIME
-      +  age +  twoparenthome + gender +black + hispanic  + geography97 + SES + citizenship
+      +  age +  twoparenthome  + black + hispanic  + geography97 + SES + citizenship
    
 '
-#############END MODEL
+#############END MODEL#############
+# By group variable cannot be included in the model, otherwise, its variance will be 0.
+# Only way to get by group is to remove the variable from the regression
+fit1_gender <- cfa(Model1, data = dataset , std.lv = TRUE, group = "gender") # By GENDER
+fitted(fit1_gender)
+summary(fit1_gender,standardized=TRUE, fit.measures = TRUE)
 
-fit1 <- cfa(Model1, data = dataset, std.lv=TRUE)
-fitted(fit1)
-summary(fit1,standardized=TRUE, fit.measures = TRUE)
-
-semPaths(fit1, whatlabels="par","std", layout="circle",sizeMan = 5, edge.label.cex = 0.8,line=3,  label.prop = 1, curve = 0.5, intercepts = FALSE, borders = TRUE, sizeInt = 1)
+# Path Analysis Graphs
+semPaths(fit1_gender, whatlabels="par", "std", layout="circle", sizeMan = 5, edge.label.cex = 0.8, line=3,  label.prop = 1, curve = 0.5, intercepts = FALSE, borders = TRUE, sizeInt = 1)
+semPaths(fit1_gender, whatlabels="par", "std", layout="spring", sizeMan = 5, edge.label.cex = 0.8, line=3,  label.prop = 1, curve = 0.5, intercepts = FALSE, borders = TRUE, sizeInt = 1)
 
 
 
@@ -113,20 +117,20 @@ HIGHSCHOOL  =~
 
 
 adultincarceration ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + HIGHSCHOOL + juvenileincarceration + CRIME
-      +  age +  twoparenthome + gender +black + hispanic  + geography97 
+      +  age +  twoparenthome + black + hispanic  + geography97 
 
 HIGHSCHOOL ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL  + juvenileincarceration + CRIME
-      +  age +  twoparenthome + gender +black + hispanic  + geography97 + SES + citizenship
+      +  age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship
    
 '
 
 ##### End Highschool Model #####
 
-fit2 <- cfa(HSModel, data = dataset, std.lv=TRUE)
-fitted(fit2)
-summary(fit2,standardized=TRUE, fit.measures = TRUE)
+fit2_gender <- cfa(HSModel, data = dataset, std.lv=TRUE, group="gender")
+fitted(fit2_gender)
+summary(fit2_gender,standardized=TRUE, fit.measures = TRUE)
 
-semPaths(fit2, whatlabels="par","std", layout="circle",sizeMan = 5, edge.label.cex = 0.8,line=3,  label.prop = 1, curve = 0.5, intercepts = FALSE, borders = TRUE, sizeInt = 1)
+semPaths(fit2_gender, whatlabels="par", "std", layout="circle",sizeMan = 5, edge.label.cex = 0.8,line=3,  label.prop = 1, curve = 0.5, intercepts = FALSE, borders = TRUE, sizeInt = 1)
 
 
 
@@ -167,22 +171,23 @@ HIGHSCHOOL  =~
 #######Regressions
 
 adultincarceration ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + HIGHSCHOOL + juvenileincarceration + CRIME
-      +  age +  twoparenthome + gender +black + hispanic  + geography97 + SES + citizenship
+      +  age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship
 
 HIGHSCHOOL ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL  + juvenileincarceration + CRIME
-      +  age +  twoparenthome + gender +black + hispanic  + geography97 + SES + citizenship
+      +  age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship
    
 ELEMSCHOOL ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY  + juvenileincarceration + CRIME
-      +  age +  twoparenthome + gender +black + hispanic  + geography97 + SES + citizenship
+      +  age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship
 '
 
 ##### End Middleschool Model #####
+# Converges when you don't ask to compute by group and include gender in the regressions
+# Does not compute the standard errors when asked to compute by group
+fit3_gender <- cfa(MSModel, data=dataset, std.lv=TRUE, group = "gender")
+fitted(fit3_gender)
+summary(fit3_gender, standardized=TRUE, fit.measures=TRUE)
 
-fit3 <- cfa(MSModel, data = dataset, std.lv=TRUE)
-fitted(fit3)
-summary(fit3, standardized=TRUE, fit.measures = TRUE)
-
-semPaths(fit3, whatlabels="par","std", layout="circle",sizeMan = 5, edge.label.cex = 0.8,line=3,  label.prop = 1, curve = 0.5, intercepts = FALSE, borders = TRUE, sizeInt = 1)
+semPaths(fit3_gender, whatlabels="par", "std", layout="circle", sizeMan = 5, edge.label.cex = 0.8,line=3,  label.prop = 1, curve = 0.5, intercepts = FALSE, borders = TRUE, sizeInt = 1)
 
 
 
