@@ -1,0 +1,419 @@
+---
+title: "Chapter 3 Linear Regression"
+author: "Matt Quinn"
+date: "5/10/2020"
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
+    math:  katex
+    toc: true
+---
+# 3. Linear Regression
+
+This chapter is about *linear regression*, a very simple, supervised learning approach for predicting a quantitative response.
+
+Can be used to answer a variety of questions.
+
+## 3.1 Simple Linear Regression
+
+A very straightforward approach for predicting a numeric response $Y$ on the basis of a single predictor variable $X$.
+
+Mathematically written as follows:
+
+<center> $Y = \beta_{0} + \beta_{1}X + \epsilon$ </center>
+
+Together, $\beta_{0}$ and $\beta_{1}X$ are referred to as the *intercept* and *slope* terms in the linear model.
+
+$\hat{y}= \hat{\beta_{0}}+\hat{\beta_{1}}X$, where $\hat{y}$ indicates the prediction of $Y$ on the basis of $X=x$. Also, the hat denotes the estimated value of an unknown response.
+
+### 3.1.1 Estimating the Coefficients
+
+In practice, the coefficients are unknown. We want to find an intercept and slope that are as close as possible to the data as possible. There are a number of ways of measuring *closeness*. The approach in this chapter utilizes the **least squares** method. Alternative approaches are discussed in Chapter 6.
+
+Residual: $e_{i} = y_{i} - \hat{y_{i}}$, or the difference between the $ith$ observed response and the $ith$ prediction from our model.
+
+Residual Sum of Squares (RSS): $RSS = \sum_{i=1}^{n}(y_{i}-\hat{y_{i}})^{2}$
+
+The Least Squares approach tries to choose parameters that minimize the RSS
+
+
+### 3.1.2 Assessing the Accuracy  of the Coefficient Estimates
+
+Remember that we assume the true relationship between $X$ and $Y$ is: $Y = f(X) + \epsilon$
+
+When $f$ is approximated by a linear function, it is written as: 
+ 
+<center> $Y = \beta_{0} + \beta_{1}X + \epsilon$ </center>
+  
+The error term is a catch-all for what we miss with this simple model: the true relationship is probably not linear and there may be measurement error.
+
+**It should be noted that we seldom believe that the true relationship is linear.**
+
+An unbiased estimator does not *systematically* over- or under-estimate the true parameter.
+
+How far off would the estimate of the population mean $\mu$ be of a random variable $Y$? This estimate is called the **standard error** of $\hat\mu$ written as $SE(\hat\mu)$ given by:
+
+* Var$(\hat\mu)$ = $SE(\hat\mu)^{2} = \frac{\sigma^{2}}{n}$, where $\sigma$ is the standard deviation of each of the observations of $Y$. 
+
+Roughly speaking, the standard error tells us the average amount that this estimate $\hat\mu$ differs from the actual value of $\mu$. The estimate of $\sigma$ is known as the *residual standard error*, and is given by $RSE = \sqrt{RSE/(n-2)}$. Standard error can be used to compute *confidence intervals*. A 95% confidence interval is defined as a range of values such that with 95% probability, the interval will contain the true unknown value of the parameter. In the simple linear regression case, the parameters estimated via the interval would be $\beta_{0}$ and $\beta_{1}$. For linear regression, the 95% confidence interval for $\beta_{1}$ approximately takes the form:
+
+<center> $\hat\beta_{1} \pm 1.96*SE(\hat\beta_{1})$ </center>
+
+That is, there is approximately a 95% chance that the lower and upper interval will contain the true value of $\hat\beta_{1}$ Similarly, a 95% confidence interval for $\beta_{0}$ takes the form:
+
+<center> $\hat\beta_{0} \pm 1.96*SE(\hat\beta_{0})$ </center>
+
+Standard errors can also be used to perform *hypothesis tests* on the coefficients. The most common of which is as follows:
+
+* $H_{0}:$ There is no relationship between $X$ and $Y$ which is $H_{0}: \beta_{1} = 0$
+
+versus the *alternative hypothesis*
+
+* $H_{a}:$ There is some relationship between $X$ and $Y$ which is $H_{a}: \beta_{1} \ne 0$
+
+To test the null hypothesis, we need to determine whether $\hat\beta_{1}$ is sufficiently far from 0. But how far is far enough? If the standard error of the estimate is small, then even relatively small values of $\hat\beta_{1}$ may provide strong evidence that alternative hypothesis has sufficient evidence. In practice, we compute a *t-statistic* which is given by:
+
+* $t = \frac{\hat\beta_{1}-0}{SE(\hat\beta_{1})}$ ,
+
+which measures the number of standard deviations that the estimate is away from 0. If there is no relationship between $X$ and $Y$, then we expect that the **t-statistic** will have a t-distribution with $n-2$ degrees of freedom. Furthermore, it is simple to compute the probability of observing any number equal to $\lvert(t)\rvert$ or larger in absolute value, which is called a **p-value**. We interpret the p-value as follows: a small p-value indicates that it is unlikely to observe such a substantial association between the predictor and the response due to chance, given there is no association to begin with. We *reject the null hypothesis* if the p-value is small enough. Typical p-value cutoffs are 5% and 1%.
+
+### 3.1.3 Assessing the Accuracy of the Model
+
+It is natural to want to quantify the extent to which the model fits the data. The quality of linear regression fit is typically assessed using two related quantities: the *residual standard error (RSE)* and the $R^{2}$ statistic.
+
+#### Residual Standard Error
+
+The RSE is an estimate of the standard deviation of $\epsilon$. Roughly speaking, it is the average amount that the response will deviate from the true regression line. It is computed using the formula:
+
+<center> $RSE = \sqrt{\frac{1}{n-2}RSS}$ </center>
+
+The RSE is considered a measure of the *lack of fit* of the model to the data. If the predictions obtained using the model are very close to the true outcome values, then the RSE will small and we can conclude that the model fits the data very well. On the other hand, if $\hat{y_{i}}$ is very far from the actual response, then the RSE may be quite large, indicating that the model doesn't fit the data well.
+
+#### $R^{2}$ Statistic
+
+The RSE provides an absolute measure of the lack of fit of the model to the data. However, it is not always clear what a good RSE number is, since it is measured in the same units of $Y$. The $R^{2}$ statistic provides an alternative measure of fit. It takes the form of a *proportion* - the proportion of variance explained - and so it takes on a value between $0$ and $1$ while being independent of the scale of $Y$.
+
+To calculate $R^{2}$, we use the formula:
+
+<center> $R^{2} = \frac{TSS - RSS}{TSS} = 1 - \frac{RSS}{TSS}$ </center>
+
+$R^{2}$ measures the *proportion of variability in $Y$ that can be explained using $X$. An $R^{2}$ that is close to $1$ indicates that a large proportion of the variability in the response has been explained by the regression. A number near $0$ indicates that the regression did not explain much of the variability in the response.
+
+## 3.2 Multiple Linear Regression
+
+
+In practice, we often have more than 1 predictor. So all we do is simply extend the simple linear regression model to accommodate for multiple variables. Multiple linear regression takes the following form:
+
+<center> $Y = \beta_{0} + \beta_{1}X_{1} + ... \beta_{p}X_{p} + \epsilon$  </center>
+
+
+We interpret $\beta_{j}$ as the *average effect on $Y$ of a 1 unit increase in $X_{j}$, holding all other predictors fixed.
+
+### 3.2.1 Estimating the Regression Coefficients
+
+Regression parameters are unknown, so they must be estimated, denoted by the $\hat{}$ symbol. The parameters are estimated using the same least squares approach that we used in simple linear regression as well. 
+
+**Not in the book itself but still important**
+
+[Source](https://www.stat.purdue.edu/~boli/stat512/lectures/topic3.pdf)
+
+Find **b** to minimize SSE = $(Y-Xb)'(Y-Xb)$, thus:
+
+<center> $b = (X'X)^{-1}X'Y$ </center>
+
+where $X$ is the design matrix and $Y$ is the response vector
+
+
+### 3.2.2 Some Important Questions
+
+
+1. Is There a Relationship Between the Response and the Predictors?
+
+Simple hypothesis setup:
+
+<center> $H_{0}: \beta_1= \beta_2 = ... \beta_p = 0$ </center>
+
+versus
+
+<center> $H_{a}:$ at least one $\beta_{j}$ is non-zero </center>
+
+This hypothesis test is performed by computing the F-statistic given by:
+
+<center> $F = \frac{(TSS - RSS)/p}{RSS/(n-p-1)}$ </center>
+
+Hence, when there is no relationship between the response and the predictors, one would expect the F-statistic to equal $1$.
+
+How large of an F-statistic is needed to reject the null hypothesis? It depends on two parameters, $n$ and $p$. When $n$ is large, an F-statistic that is just a little larger than 1 might provide sufficient evidence against $H_0$. When $H_0$ is true and the errors have a normal distribution (or if $n$ is large), the F-statistic follows an F-distribution.
+
+*The square of each t-statistic is the corresponding F-statistic*
+
+The approach of using an F-statistic to test for any association between
+the predictors and the response works when $p$ is relatively small, and certainly
+small compared to $n$. However, sometimes we have a very large number
+of variables. If $p>n$ then there are more coefficients $\beta_j$ to estimate
+than observations from which to estimate them. In this case we cannot
+even fit the multiple linear regression model using least squares, so the F-statistic cannot be used. This high-dimensional setting is discussed in Chapter 6.
+
+2. Deciding on Important Variables
+
+
+There are a total of $2^{p}$ total model that contain a subset of the $p$ predictors, so trying out every single combination can be unfeasible for even moderate $p$. We need an automated and efficient approach to choose a smaller set of models to consider. There are 3 approaches for this task:
+
+* Forward Selection:
+  
+Begin with the *null model* and then add terms as you go
+
+* Backward Selection:
+
+Begin with all variables in the model, then remove terms as you go
+
+* Step-wise Selection:
+
+* Start with no variables in the model and continue to add variables one-by-one. Remove variables if p-values are large iteratively. 
+
+3. Model Fit
+
+Two of the most common measures of a model's fit are the RSE and $R^{2}$, the fraction of variance explained. $R^{2}$ always increases as you add more variables to the model, so we use the adjusted $R^{2}$ instead.
+
+
+4. Predictions
+
+There are 3 sorts of uncertainty associated with prediction:
+
+*reducible error*, *model bias*, *irreducible error*
+
+
+## 3.3 Other Considerations in the Regression Model
+
+### 3.3.1 Qualitative Predictors
+
+In the real world, often, some predictors are qualitative.
+
+#### Predictors with Only 2 Levels
+
+If a qualitative predictor (also known as a factor) only has two levels, or possible values, then incorporating it into a regression model is very simple. We can simply create an indicator or **dummy variable** that takes on two possible numerical values.
+
+#### Qualitative Predictors with More than 2 Levels
+
+When a qualitative predictor has more than 2 levels, a single dummy variable cannot represent all possible values. In this situation, we can create additional dummy variables. Using this dummy variable approach presents no difficulties when incorporating both numeric and categorical predictors. There are many other ways of coding categorical variables besides the dummy variable approach taken here.
+
+
+### 3.3.2 Extensions of the Linear Model
+
+
+The hierarchical principle states that if we include an interaction in a model, we should also include the main effects, even if the p-values associated with their coefficients are not significant.
+
+#### Non-linear Relationships
+
+The linear regression model assumes a linear relationship between the response and the predictors. However, in some cases, the true relationship may be non-linear. To accommodate for this right now, we'll use *polynomial regression*. In later chapters, we'll present more complex approaches for performing non-linear fits in more general settings.
+
+A simple approach for incorporating non-linear associations in a linear model is to include transformed versions of the predictors in the model. For example, if the shape of the scatter plot looks like a parabola, considering adding a quadratic term to your model.
+
+### 3.3.3. Potential Problems
+
+
+1. Non-linearity of the relationship
+
+Can be identified using residual plots
+
+2. Correlation of error terms
+
+Important assumption is that the error terms are uncorrelated. If there is correlation, then the standard errors of the coefficients will tend to underestimate the true standard errors. As a result, confidence and prediction intervals will be narrower than they should be. Such correlations frequently occur in the context of *time series* data.
+
+3. Non-constant variance of error terms
+
+Also called heteroscedasticity, or the presence of a *funnel shape* in the residual plot.
+
+4. Outliers
+
+Can be identified via the studentized residuals or the scatterplot
+
+5. High-leverage points
+
+Have an unusual value for $x_i$. In order to quantify an observation's leverage, we compute the *leverage statistic*, where a higher value indicates an observation has high leverage.
+
+6. Collinearity
+
+Collinearity refers to the situation in which two or more predictor variables are closely related to one another. Collinearity reduces the accuracy of the estimates of the regression coefficients. A simple way to detect collinearity is to look at the correlation matrix of the predictors. However, to detect multicollinearity, you can't use the simple correlation matrix. Instead, you examine the *variance inflation factor* (VIF). The VIF is the ratio of the variance of $\hat\beta_j$ when fitting the full model divided by the variance of $\hat\beta_j$ if fit on its own. The smallest possible value for VIF is 1, which indicates the complete absence of collinearity. As a rule of thumb, a VIF value that exceeds 5 or 10 indicates a problematic amount of collinearity. The VIF for each variable can be computed using the following formula:
+
+<center>$VIF(\hat{\beta_{j}}) = \frac{1}{1-R^2}$ </center> 
+
+When faced with the problem of collinearity, there are two simple solutions. The first is to drop the problematic variables out of the regression equation. The second solution is to combine the col-linear variables into a single predictor.
+
+## 3.4 The Marketing Plan
+
+## 3.5 Comparison of Linear Regression with K-Nearest Neighbors
+
+Linear regression is an example of a parametric approach because it has assumptions. In contrast, non-parametric methods do not assume a parametric form for $f(X)$ and are therefore more flexible.
+
+The KNN regression method is closely related to the KNN classifier discussed in chapter 2. Given a value for $K$ and a prediction point $x_0$, KNN regression first identifies the $K$ training observations that are the closest to $x_0$, represented by $N_0$. It then estimates $f(x_0)$ using the mean of all the training responses $N_0$. In other words:
+
+<center> $\hat{f}(x_0) = \frac{1}{K}\sum_{x_i}{y_i}$ </center>
+
+In general, the optimal value of $K$ will depend on the *bias-variance trade-off* which was introduced in Chapter 2. A small value for $K$ provides the most flexible fit, which will have a low bias but high variance (potential to over-fit). In contrast, larger values of $K$ provide a smoother and less variable fit; the prediction in a region is an average of several points, so changing one observation has a smaller effect. 
+
+It should be noted that the parametric approach will outperform the non-parametric approach if the parametric form that has been selected is close to the true form of $f$.
+
+## 3.6 Lab: Linear Regression
+
+```{r}
+library(MASS)
+library(ISLR)
+```
+
+
+### 3.6.2 Simple Linear Regression
+
+The `MASS` library contains the `Boston` dataset, which records the median house value for 506 neighborhoods around Boston. We will seek to predict `medv` using 13 predictors.
+
+```{r}
+names(Boston)
+```
+To fit a linear regression model:
+
+`lm(y~x, data=data)`
+
+```{r}
+lm.fit <- lm(medv~lstat, data = Boston)
+summary(lm.fit)
+```
+In order to obtain a confidence interval for the coefficients, we can use the `confint()` function.
+
+```{r}
+confint(lm.fit)
+```
+The `predict()` function can be used to produce confidence intervals and prediction intervals for the prediction of a response given a value of the predictor.
+
+```{r}
+predict(lm.fit, newdata = data.frame(lstat=c(5,10,15)), interval = "confidence")
+```
+For prediction intervals:
+
+```{r}
+predict(lm.fit, newdata = data.frame(lstat=c(5,10,15)), interval = "prediction")
+```
+
+### 3.6.3 Multiple Linear Regression
+
+In order to fit a multiple linear regression model using least squares, we once again use the `lm()` function. The `summary()` function now outputs the regression coefficients for all of the predictors.
+
+```{r}
+lm.fit <- lm(medv ~ lstat + age, data = Boston)
+summary(lm.fit)
+```
+To use all of the variables, use the `.` shorthand version:
+```{r}
+lm.fit <- lm(medv ~., data=Boston)
+summary(lm.fit)
+```
+
+### 3.6.4 Interaction Terms
+
+It is easy to include interaction terms in a linear model using the `lm()` function. The syntax `lstat:black` tells R to include an interaction term between `lstat` and `black`.
+
+```{r}
+summary(lm(medv~lstat*age, data=Boston))
+```
+### 3.6.5 Non-linear Transformations of the Predictors
+
+The `lm()` function can also accommodate non-linear transformations of the predictors. For instance, given a predictor $X$, we can create an $X^{2}$ predictor using `I(X^2)`. The function `I()` is needed since the $\hat{}$ has a special meaning in a formula.
+
+```{r}
+lm.fit2 <- lm(medv ~ lstat + I(lstat^2), data=Boston)
+summary(lm.fit2)
+```
+The near-zero p-value associated with the quadratic term suggests it leads to an improved model. We use the `anova()` function to further quantify the extent to which the quadratic fit is superior to the linear fit.
+
+```{r}
+lm.fit <- lm(medv~lstat, data=Boston)
+anova(lm.fit, lm.fit2)
+```
+
+
+### 3.6.6 Qualitative Predictors
+
+We will now examine the **Carseats** data, which is part of the `ISLR` library. We will attempt to predict `Sales` in 400 locations based the following predictors:
+
+```{r}
+names(Carseats)
+```
+The predictor `Shelveloc` takes on three possible values: *Bad, Medium, and Good.* Given a qualitative variable, R generates dummy variables automatically.
+
+```{r}
+lm.fit <- lm(Sales ~. + Income:Advertising+Price:Age, data=Carseats)
+summary(lm.fit)
+```
+The `contrasts()` function returns the coding that R uses for the dummy variables.
+
+```{r}
+contrasts(Carseats$ShelveLoc)
+```
+
+### 3.6.7 Writing Functions
+
+As we have seen, R comes with many useful functions. However, we will often be interested in performing an operation for which no function is available. In this setting, we may want to write our own function.
+
+The `{` symbol informs R that multiple commands are about to be input. Finally, the `}` symbol informs R that no further commands will be entered.
+
+```{r}
+LoadLibraries <- function(){
+  library(ISLR)
+  library(MASS)
+  print("The libraries have been loaded.")
+}
+```
+
+
+```{r}
+LoadLibraries()
+```
+When we call the function, it loads the libraries and prints out the helpful statement at the end.
+
+## 3.7 Exercises
+
+### Applied
+
+
+8. This question involves the use of simple linear regression on the `Auto` dataset.
+
+(a) 
+```{r}
+lm.auto <- lm(mpg~horsepower, data=Auto)
+summary(lm.auto)
+```
+  i. Yes, there is a relationship between the predictor and the response
+  
+  ii. Very strong relationship
+  
+  iii. Negative relationship
+  
+  iv. 24.47 mpg
+  
+(b)
+```{r}
+plot(Auto$horsepower, Auto$mpg, main = "Horsepower vs MPG")
+abline(lm.auto, col="red")
+```
+(c)
+Diagnostic Plots:
+```{r}
+plot(lm.auto)
+```
+Appears to be hetero-scedastic.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

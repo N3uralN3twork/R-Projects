@@ -1,0 +1,88 @@
+---
+title: "Chapter 4 Classification"
+author: "Matt Quinn"
+date: "5/11/2020"
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
+    math:  katex
+    toc: true
+---
+# 4 Classification
+
+## 4.1 An Overview of Classification 
+
+The linear regression model discussed in Chapter 3 assumes that the respsonse variable $Y$ is quantitative. But in many situations, the response variable is instead *qualitative*/*categorical*. In this chapter we study approaches for predicting categorical responses, a process that is known as **classification**. Often, the methods used for classification first predict the probability of each fo the categories of a qualitative variable, as the basis for making the classification.
+
+In this chapter, we discuss three of the most widely-used classifiers: *logistic regression, linear discriminant analysis* and *K-nearest neighbors*.
+
+Some examples of classification problems:
+
+* Which of three conditions does the individual have?
+
+* Is this transaction fradulent?
+
+* Which DNA mutations are deleterious?
+
+In this chapter, we'll make heavy use of the `Default` dataset. We are interested in predicting whether an individual will default on his or her credit card payment, on the basis of annual income and monthly credit card balance.
+
+## 4.2 Why Not Linear Regression?
+
+Unfortunately, there is no natural way to convert a qualitative response variable with more than two levels into a categorical response that is ready for linear regression. Some of the estimates, if you were to use linear regression, would lead to predictions outside of the $[0,1]$ interval.
+
+## 4.3 Logistic Regression
+
+Consider again the `Default` dataset, where the response `default` falls into one of two categories, `Yes` or `No`. Rather than modeling this response $Y$ directly, logistic regression models the *probability* that $Y$ belongs to a particular category. 
+
+The values of $P(default=Yes|balance)$ will range between $0$ and $1$. Then for any given value of balance, a prediction can be made for default.
+
+### 4.3.1 The Logistic Model
+
+Any time a straight line is fit to a binary response that is coded as $0$ or $1$, we can always predict $p(X) < 0$ for some values of $X$ and $p(X)>1$ for others. To avoid this problem, we must model $p(X)$ using a function that gives outputs between $0$ and $1$ for all values of $X$. In logistic regression, we use the *logistic function*, given by:
+
+<center> $P(X) = \frac{e^{\beta_0+\beta_1X}}{1+e^{\beta_0+\beta_1X}}$ </center>
+
+To fit the model, we use a method called **maximum likelihood**, which will be discussed soon. The logistic function will always produce an S-shaped curve of this form, and so regardless of the value of $X$, we will obtain a sensible prediction between $0$ and $1$. The quantity $\frac{P(X)}{1-P(X)}$ is called the **odds** and can take any value between $0$ and $\infty$. Values of odds close to $0$ and $\infty$ indicate very low and very high probabilities of default, respectively. Finally, we arrive at:
+
+<center> $log(\frac{P(X)}{1-P(X)}) = \beta_0 + \beta_1X$ </center>
+
+The left-hand side is called the **log-odds** or **logit**, thus, increasing $X$ by one unit changes the log odds by $\beta_{1}$, or it multiplies the odds by $e^{\beta_1}$.
+
+### 4.3.2 Estimating the Regression Coefficients
+
+Although we could use non-linear least squares to fit the model, the more general method of **maximum likelihood** is preferred. The intuition is as follows: we seek estimates for $\beta_0$ and $\beta_1$ such that the we maximize the likelihood function.
+
+Maximum likelihood is a very general approach that is used to fit many of the non-linear models that we examine throughout the book. In the case of linear regression, the least squares approach is a special case of maximum likelihood.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
