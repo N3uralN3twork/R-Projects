@@ -62,7 +62,7 @@ HIGHSCHOOL  =~
 #######Regressions
 
 
-adultincarceration ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + HIGHSCHOOL + juvenileincarceration + CRIME
+adultincarceration ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + HIGHSCHOOL + DELINQUENCY + juvenileincarceration + CRIME
       +  age +  twoparenthome  + black + hispanic  + geography97 + SES + citizenship
    
 '
@@ -88,7 +88,7 @@ TRAUMACRIME =~ jail
     + victim + gunshotless12 + gunshot12to18
 
 TRAUMAPOVERTY =~  unemployment + homeless 
-    + poverty1997 + poverty1998 + poverty 1999 + poverty2000 + poverty2001 + poverty2002
+    + poverty1997 + poverty1998 + poverty1999 + poverty2000 + poverty2001 + poverty2002
     
 TRAUMAFAMILY =~ death + hospitalization + divorce
 
@@ -116,19 +116,19 @@ HIGHSCHOOL  =~
 #######Regressions
 
 
-adultincarceration ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + HIGHSCHOOL + juvenileincarceration + CRIME
-      +  age +  twoparenthome + black + hispanic  + geography97 
+adultincarceration ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + HIGHSCHOOL + DELINQUENCY + juvenileincarceration + CRIME
+      +  age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship
 
-HIGHSCHOOL ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL  + juvenileincarceration + CRIME
+HIGHSCHOOL ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL  + DELINQUENCY + juvenileincarceration + CRIME
       +  age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship
    
 '
 
 ##### End Highschool Model #####
 
-fit2_gender <- cfa(HSModel, data = dataset, std.lv=TRUE, group="gender")
+fit2_gender <- cfa(HSModel, data=dataset, std.lv=TRUE, group="gender")
 fitted(fit2_gender)
-summary(fit2_gender,standardized=TRUE, fit.measures = TRUE)
+summary(fit2_gender,standardized=TRUE, fit.measures=TRUE)
 
 semPaths(fit2_gender, whatlabels="par", "std", layout="circle",sizeMan = 5, edge.label.cex = 0.8,line=3,  label.prop = 1, curve = 0.5, intercepts = FALSE, borders = TRUE, sizeInt = 1)
 
@@ -170,32 +170,24 @@ HIGHSCHOOL  =~
 
 #######Regressions
 
-adultincarceration ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + HIGHSCHOOL + juvenileincarceration + CRIME
-      +  age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship
+adultincarceration ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + HIGHSCHOOL + CRIME + juvenileincarceration
+      +  age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship + gender
 
-HIGHSCHOOL ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL  + juvenileincarceration + CRIME
-      +  age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship
+HIGHSCHOOL ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL  + juvenileincarceration
+      +  age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship + gender
    
-ELEMSCHOOL ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY  + juvenileincarceration + CRIME
-      +  age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship
+ELEMSCHOOL ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY  + juvenileincarceration 
+      +  age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship + gender
 '
 
 ##### End Middleschool Model #####
 # Converges when you don't ask to compute by group and include gender in the regressions
 # Does not compute the standard errors when asked to compute by group
-fit3_gender <- cfa(MSModel, data=dataset, std.lv=TRUE, group = "gender")
-fitted(fit3_gender)
-summary(fit3_gender, standardized=TRUE, fit.measures=TRUE)
+fit3 <- cfa(MSModel, data=dataset, std.lv=TRUE)
+fitted(fit3)
+summary(fit3, standardized=TRUE, fit.measures=TRUE)
 
-semPaths(fit3_gender, whatlabels="par", "std", layout="circle", sizeMan = 5, edge.label.cex = 0.8,line=3,  label.prop = 1, curve = 0.5, intercepts = FALSE, borders = TRUE, sizeInt = 1)
-
-
-
-
-
-
-
-
+semPaths(fit3, whatlabels="par", "std", layout="circle", sizeMan = 5, edge.label.cex = 0.8,line=3,  label.prop = 1, curve = 0.5, intercepts = FALSE, borders = TRUE, sizeInt = 1)
 
 
 
