@@ -29,7 +29,7 @@ variables <- as.data.frame(names(dataset))
 #### Full Model ####
 
 FullModel <- 
-'
+"
 #######Latent Variables
 TRAUMACRIME =~ jail 
     + victim + gunshotless12 + gunshot12to18
@@ -64,13 +64,13 @@ HIGHSCHOOL =~
 
 adultincarceration ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + HIGHSCHOOL + juvenileincarceration + CRIME
       + age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship + gender
-
+      
 HIGHSCHOOL ~ TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + DELINQUENCY + juvenileincarceration + CRIME
       + age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship + gender
     
 ELEMSCHOOL ~ TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + juvenileincarceration
       + age + twoparenthome + black + hispanic + geography97 + citizenship + gender
-'
+"
 
 # There seems to be a problem with the elementary/middle school latent variable
 # Model won't converge if SES is included in the regression
@@ -130,7 +130,7 @@ HIGHSCHOOL ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL  + juvenil
 
 # There seems to be a problem with the elementary/middle school latent variable
 # Model won't converge if its included in the regressions
-fit2 <- sem(GenderModel, data=dataset, std.lv=TRUE, group = "gender")
+fit2 <- cfa(GenderModel, data=dataset, std.lv=TRUE, group = "gender")
 summary(fit2, standardized=TRUE, fit.measures=TRUE)
 
 
