@@ -126,6 +126,8 @@ adultincarceration ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + 
 
 HIGHSCHOOL ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL  + juvenileincarceration
       +  age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship
+
+ELEMSCHOOL ~ TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + juvenileincarceration + geography97 + age + twoparenthome + black
 "
 
 # There seems to be a problem with the elementary/middle school latent variable
