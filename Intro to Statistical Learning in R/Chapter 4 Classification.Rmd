@@ -54,9 +54,22 @@ Although we could use non-linear least squares to fit the model, the more genera
 
 Maximum likelihood is a very general approach that is used to fit many of the non-linear models that we examine throughout the book. In the case of linear regression, the least squares approach is a special case of maximum likelihood.
 
+### 4.3.3 Making Predictions
+
+<center> $P(X) = \frac{e^{equation}}{1+e^{equation}}$ </center>
+
+Just plug and chug your observed data into the regression coefficients.
 
 
+### 4.3.4 Multiple Logistic Regression
 
+We now consider the problem of a binary response using multiple predictors.
+
+<center> $log(\frac{P(X)}{1-P(X)}) = \beta_0 + \beta_1X_1 + ... \beta_pX_p$ </center>
+
+It's just like how we extended linear regression to include multiple coefficients.
+
+The results obtained using one predictor may be quite different from those obtained using multiple predictors, especially when there is correlation among the predictors. This phenomenom is known as *confounding*.
 
 
 
