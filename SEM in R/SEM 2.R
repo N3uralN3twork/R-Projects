@@ -71,12 +71,60 @@ attach(dataset)
 variables <- as.data.frame(names(dataset))
 
 
+#### DEMOGRAPHIC TABLES ####
+gender <- table(GR, gender)
+race <- table(GR, race)
+ses <- table(GR, SES)
+twoparent <- table(GR, twoparenthome)
+citizen <- table(GR, citizenship)
+geo <- table(GR, geography97)
+esuspend <- table(GR, ESuspend)
+msuspend <- table(GR, MSuspend)
+hsuspend <- table(GR, HSuspend)
+elemmiddropout <- table(GR, elementmiddledropout)
+hdrop <- table(GR, highdropout)
+jincarce <- table(GR, Jincarceration)
+aincarce <- table(GR, Aincarceration)
 
 
+tables <- list(gender, race, ses, twoparent, citizen, geo, esuspend,
+               msuspend, hsuspend, elemmiddropout, hdrop, jincarce, aincarce)
+lapply(tables, chisq.test)
 
-#### Full Model ####
+# Variables
+t.test(dataset$age)
+t.test(dataset$elementarysuspend)
+t.test(dataset$middlesuspend)
+t.test(dataset$highsuspend)
+t.test(dataset$highgrade15)
+t.test(dataset$firstincarcerationage)
+t.test(dataset$totalincarceration)
+t.test(dataset$juvenileincarceration)
+t.test(dataset$adultincarceration)
+t.test(dataset$totalincarcemon)
+t.test(dataset$elementaryincarcemon)
+t.test(dataset$middleincarcemon)
+t.test(dataset$highincarcemon)
+t.test(dataset$adultincarcemon)
+
+# Demographic Tables
+round(prop.table(table(HSuspend, gender), margin = 2), 3)
+chisq.test(table(race, gender))
+chisq.test(table(SES, gender))
+chisq.test(table(twoparenthome, gender))
+chisq.test(table(citizenship, gender))
+chisq.test(table(geography97, gender))
+chisq.test(table(ESuspend, gender))
+chisq.test(table(MSuspend, gender))
+chisq.test(table(HSuspend, gender))
+chisq.test(table(elementmiddledropout, gender))
+chisq.test(table(highdropout, gender))
+chisq.test(table(Jincarceration, gender))
+chisq.test(table(Aincarceration, gender))
+
+#### BEGIN FULL MODEL ####
 FullModel <- 
-"
+  "
 #######Latent Variables
 TRAUMACRIME =~ jail 
     + victim + gunshotless12 + gunshot12to18
@@ -110,21 +158,19 @@ DELINQUENCY ~~ CRIME
 #######Regressions
 
 
-adultincarceration ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + HIGHSCHOOL + juvenileincarceration + CRIME
+adultincarceration ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + HIGHSCHOOL + Jincarceration + CRIME
       + age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship + gender
       
-HIGHSCHOOL ~ TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + DELINQUENCY + juvenileincarceration
+HIGHSCHOOL ~ TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + DELINQUENCY + Jincarceration
       + age +  twoparenthome + black + hispanic  + geography97 + SES + citizenship + gender
    
-ELEMSCHOOL ~ TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + juvenileincarceration
+ELEMSCHOOL ~ TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + Jincarceration
       + age + twoparenthome + black + hispanic + geography97 + SES + citizenship + gender
 
 "
 #### END FULL MODEL ####
 
-# There seems to be a problem with the elementary/middle school latent variable
-# Model won't converge if SES is included in the regression
-# Highest correlation in SES is 0.2
+
 
 fit1 <- cfa(FullModel, data=dataset, std.lv=TRUE)
 summary(fit1, standardized=TRUE, fit.measures=TRUE)
