@@ -68,7 +68,9 @@
 <li><a href="#estimating-the-regression-coefficients">4.3.2 Estimating the Regression Coefficients</a></li>
 <li><a href="#making-predictions">4.3.3 Making Predictions</a></li>
 <li><a href="#multiple-logistic-regression">4.3.4 Multiple Logistic Regression</a></li>
+<li><a href="#logistic-regression-for-2-response-classes">4.3.5 Logistic Regression for &gt;2 Response Classes</a></li>
 </ul></li>
+<li><a href="#linear-discriminant-analysis">Linear Discriminant Analysis</a></li>
 </ul></li>
 </ul>
 </div>
@@ -78,12 +80,12 @@
 <h1>4 Classification</h1>
 <div id="an-overview-of-classification" class="section level2">
 <h2>4.1 An Overview of Classification</h2>
-<p>The linear regression model discussed in Chapter 3 assumes that the respsonse variable <span class="math inline">\(Y\)</span> is quantitative. But in many situations, the response variable is instead <em>qualitative</em>/<em>categorical</em>. In this chapter we study approaches for predicting categorical responses, a process that is known as <strong>classification</strong>. Often, the methods used for classification first predict the probability of each fo the categories of a qualitative variable, as the basis for making the classification.</p>
+<p>The linear regression model discussed in Chapter 3 assumes that the response variable <span class="math inline">\(Y\)</span> is quantitative. But in many situations, the response variable is instead <em>qualitative</em>/<em>categorical</em>. In this chapter we study approaches for predicting categorical responses, a process that is known as <strong>classification</strong>. Often, the methods used for classification first predict the probability of each of the categories of a qualitative variable, as the basis for making the classification.</p>
 <p>In this chapter, we discuss three of the most widely-used classifiers: <em>logistic regression, linear discriminant analysis</em> and <em>K-nearest neighbors</em>.</p>
 <p>Some examples of classification problems:</p>
 <ul>
 <li><p>Which of three conditions does the individual have?</p></li>
-<li><p>Is this transaction fradulent?</p></li>
+<li><p>Is this transaction fraudulent?</p></li>
 <li><p>Which DNA mutations are deleterious?</p></li>
 </ul>
 <p>In this chapter, we’ll make heavy use of the <code>Default</code> dataset. We are interested in predicting whether an individual will default on his or her credit card payment, on the basis of annual income and monthly credit card balance.</p>
@@ -127,8 +129,21 @@
 <span class="math inline">\(log(\frac{P(X)}{1-P(X)}) = \beta_0 + \beta_1X_1 + ... \beta_pX_p\)</span>
 </center>
 <p>It’s just like how we extended linear regression to include multiple coefficients.</p>
-<p>The results obtained using one predictor may be quite different from those obtained using multiple predictors, especially when there is correlation among the predictors. This phenomenom is known as <em>confounding</em>.</p>
+<p>The results obtained using one predictor may be quite different from those obtained using multiple predictors, especially when there is correlation among the predictors. This phenomenon is known as <em>confounding</em>.</p>
 </div>
+<div id="logistic-regression-for-2-response-classes" class="section level3">
+<h3>4.3.5 Logistic Regression for &gt;2 Response Classes</h3>
+<p>We sometimes wish to classify a response variable that has more than two classes. We do not go into detail on multiple-class logistic regression, but the software to do so is available in R.</p>
+</div>
+</div>
+<div id="linear-discriminant-analysis" class="section level2">
+<h2>Linear Discriminant Analysis</h2>
+<p>Why do we need another method when we have logistic regression? There are several reasons:</p>
+<ul>
+<li><p>When the classes are well separated, the parameter estimates for the logistic regression model are unstable. LDA does not suffer from this problem</p></li>
+<li><p>If <span class="math inline">\(n\)</span> is small and the distribution of the predictors <span class="math inline">\(X\)</span> is approximately normal in each of the classes, the LDA model is again more stable than the logistic regression model</p></li>
+<li><p>LDA is popular when we have more than two response classes.</p></li>
+</ul>
 </div>
 </div>
 </section>

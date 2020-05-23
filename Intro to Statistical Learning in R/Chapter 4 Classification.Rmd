@@ -12,7 +12,7 @@ output:
 
 ## 4.1 An Overview of Classification 
 
-The linear regression model discussed in Chapter 3 assumes that the respsonse variable $Y$ is quantitative. But in many situations, the response variable is instead *qualitative*/*categorical*. In this chapter we study approaches for predicting categorical responses, a process that is known as **classification**. Often, the methods used for classification first predict the probability of each fo the categories of a qualitative variable, as the basis for making the classification.
+The linear regression model discussed in Chapter 3 assumes that the response variable $Y$ is quantitative. But in many situations, the response variable is instead *qualitative*/*categorical*. In this chapter we study approaches for predicting categorical responses, a process that is known as **classification**. Often, the methods used for classification first predict the probability of each of the categories of a qualitative variable, as the basis for making the classification.
 
 In this chapter, we discuss three of the most widely-used classifiers: *logistic regression, linear discriminant analysis* and *K-nearest neighbors*.
 
@@ -20,7 +20,7 @@ Some examples of classification problems:
 
 * Which of three conditions does the individual have?
 
-* Is this transaction fradulent?
+* Is this transaction fraudulent?
 
 * Which DNA mutations are deleterious?
 
@@ -69,10 +69,21 @@ We now consider the problem of a binary response using multiple predictors.
 
 It's just like how we extended linear regression to include multiple coefficients.
 
-The results obtained using one predictor may be quite different from those obtained using multiple predictors, especially when there is correlation among the predictors. This phenomenom is known as *confounding*.
+The results obtained using one predictor may be quite different from those obtained using multiple predictors, especially when there is correlation among the predictors. This phenomenon is known as *confounding*.
 
+### 4.3.5 Logistic Regression for >2 Response Classes
 
+We sometimes wish to classify a response variable that has more than two classes. We do not go into detail on multiple-class logistic regression, but the software to do so is available in R.
 
+## 4.4 Linear Discriminant Analysis
+
+Why do we need another method when we have logistic regression? There are several reasons:
+
+* When the classes are well separated, the parameter estimates for the logistic regression model are unstable. LDA does not suffer from this problem
+
+* If $n$ is small and the distribution of the predictors $X$ is approximately normal in each of the classes, the LDA model is again more stable than the logistic regression model
+
+* LDA is popular when we have more than two response classes.
 
 
 
