@@ -93,11 +93,6 @@ ServicesSummary <- Services %>%
 
 table(ServicesSummary$Category)
 
-ServicesSummary %>%
-  group_by(Category) %>%
-  summarise(Medicaid = mean(AmtPaidM),
-            Board = mean(AmtPaidB))
-
 #write.xlsx(ServicesSummary, sheetName = "ADAMHS", file = "ADAMHS.xlsx", col.names = TRUE, row.names = FALSE)
 
 
@@ -156,10 +151,11 @@ leaflet(data = data) %>%
 "Merge Demographics with the Services Summary:"
 
 
+names(members)
+names(ServicesSummary)
 
-
-
-
+merged <- merge(members, ServicesSummary, by="IndividualId")
+#write.csv(merged, "MergedADAMS.csv", col.names = TRUE, row.names = FALSE)
 
 
 
