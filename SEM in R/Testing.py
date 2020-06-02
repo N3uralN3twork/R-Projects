@@ -1,48 +1,16 @@
-import numpy as np
-import pandas as pd
-
 ###############################################################################
 ###                     1.  Define Working Directory                        ###
 ###############################################################################
 import os
+import pandas as pd
+import numpy as np
 abspath = os.path.abspath("C:/Users/miqui/OneDrive/R Projects/SEM in R")
 os.chdir(abspath)
 
+Services = pd.read_excel("ADAMHSCCNeedsAssessmentData20200522.xlsx", header=0)
 
-nls = pd.read_spss("NLS 2 no formats.sav")
+Services.columns
 
-nls.head(5)
-nls.info()
-nls.columns
-
-# Create new variables
-
-
-
-
-" 1. Create a table of descriptive statistics by ME status:"
-
-
-# Obtain summary statistics for numeric variables by group:
-
-nls.columns
-
-def numeric(data, var, group):
-    mean = data.groupby(str(group))[str(var)].mean()
-    std  = data.groupby(str(group))[str(var)].std()
-    list = [mean, std]
-    print(f"Mean: {list[0]}, \nStd: {list[1]}")
-
-
-numeric(nls, var="adultincarcemon", group="gender")
-
-
-
-
-variables = pd.DataFrame(nls.columns)
-
-
-
-
+test = Services.groupby("IndividualId", axis="columns")
 
 
