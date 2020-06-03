@@ -1,6 +1,7 @@
 #### Set WD and Import the Datasets####
 setwd("C:/Users/miqui/OneDrive/R Projects/ADAMS Board")
 library(readxl)
+library(readr)
 library(dplyr)
 library(lubridate)
 library(leaflet)
@@ -158,12 +159,46 @@ merged <- merge(members, ServicesSummary, by="IndividualId")
 #write.csv(merged, "MergedADAMS.csv", col.names = TRUE, row.names = FALSE)
 
 
+"Cluster Analysis:"
 
+# Read in the newly merged dataset
+library(readr)
+adams <- read_csv("MergedADAMS.csv", col_types = cols(Birthdate = col_date(format = "%m/%d/%Y")))
+View(adams)
+attach(adams)
 
+# Replace NAs with 0
 
+adams$NumServM[is.na(adams$NumServM)] <- 0
+adams$ZipCode[is.na(adams$ZipCode)] <- 0
 
+# Create an AGE variable, base date is May 1st 2020:
+names(adams)
+base_date <- as.Date("2020-05-01")
+adams <- adams %>%
+            mutate(Age = (base_date - Birthdate)/365)
+adams$Age <- as.numeric(adams$Age)
 
+# Create a TOTAL PAID variable:
+adams <- adams %>%
+            mutate(TotalPaid = AmtPaidB + AmtPaidM)
 
+# Create a TOTAL NUM variable:
+adams <- adams %>%
+            mutate(TotalNum = NumServB + NumServM)
+adams$ZipCode <- as.numeric(adams$ZipCode)
+"Preprocessing:" 
 
+# Select only the numeric columns
+Numeric <- adams %>% 
+              select_if(is.numeric) %>%
+              select(-MasterIndividualId)
 
+Category <- adams$Category
+Numeric <- cbind(Numeric, Category)
+write.csv(Numeric, "Numeric.csv", col.names = TRUE, row.names = FALSE)
+
+"Perform Cluster Analysis:"
+library(cluster)
+library(factoextra)
 
