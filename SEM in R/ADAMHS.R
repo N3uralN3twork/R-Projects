@@ -2,11 +2,13 @@
 setwd("C:/Users/miqui/OneDrive/R Projects/ADAMS Board")
 library(readxl)
 library(readr)
+library(xlsx)
 library(dplyr)
 library(lubridate)
 library(leaflet)
 library(ggmap)
 library(stringr)
+
 members <- read_excel("ADAMHSCCNeedsAssessmentData20200522.xlsx", 
                       sheet = "Members")
 View(members)
@@ -74,27 +76,36 @@ Services <- Services %>% select(IndividualId, Payment, PayerOfService)
   2. NumServM
   3. AmtPaidB
   4. NumServB
+  5. NumSUD
+  6. NumMH
   "
-
 ServicesSummary <- Services %>%
-  select(IndividualId, Payment, PayerOfService) %>%
+  select(IndividualId, Payment, PayerOfService, ProviderType) %>%
   group_by(IndividualId) %>%
   summarise(AmtPaidM = sum(Payment[PayerOfService=="MEDICAID"]),
-            NumServM = table(PayerOfService)[2],
+            NumServM = sum(PayerOfService=="MEDICAID"),
             AmtPaidB = sum(Payment[PayerOfService=="BOARD"]),
-            NumServB = table(PayerOfService)[1]) %>%
+            NumServB = sum(PayerOfService=="BOARD"),
+            NumSUD = sum(ProviderType=="SUD"),
+            NumMH = sum(ProviderType=="MH")) %>%
   mutate(Category = 
-           case_when(AmtPaidM >= 1 & AmtPaidB >=1 ~ "Both",
-                     AmtPaidM == 0 & AmtPaidB >=1 ~ "Board Only",
-                     AmtPaidM >= 1 & AmtPaidB ==0 ~ "Medicaid Only",
-                     AmtPaidM == 0 & AmtPaidB ==0 ~ "Neither"))
+           case_when(NumServM > 0 & NumServB > 0 ~ "Both",
+                     NumServM == 0 & NumServB >= 1 ~ "Board Only",
+                     NumServM >= 1 & NumServB == 0 ~ "Medicaid Only",
+                     AmtPaidM == 0 & AmtPaidB == 0 ~ "Neither")) %>%
+  mutate(ProviderCategory = 
+           case_when(NumSUD > 0 & NumMH > 0 ~ "Both",
+                     NumSUD > 0 & NumMH == 0 ~ "SUD Only",
+                     NumSUD == 0 & NumMH > 0 ~ "MH Only",
+                     is.na(NumSUD) & is.na(NumMH) ~ "Neither"))
 
-
-
-
+# Create a table of the categories:
 table(ServicesSummary$Category)
+table(ServicesSummary$ProviderCategory)
 
-#write.xlsx(ServicesSummary, sheetName = "ADAMHS", file = "ADAMHS.xlsx", col.names = TRUE, row.names = FALSE)
+# Write to an Excel file:
+ServicesSummary <- as.data.frame(ServicesSummary)
+write.xlsx(ServicesSummary, sheetName = "ADAMHS", file = "ServicesSummary.xlsx", col.names = TRUE, row.names = FALSE)
 
 
 "Create a Map of the Data:"
