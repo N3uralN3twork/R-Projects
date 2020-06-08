@@ -27,4 +27,7 @@ X = dataset.drop(["Aincarceration"], axis=1)
 y = dataset["Aincarceration"]
 y.value_counts()
 
+#########################################################
+###           5. Logistic Regression                  ###
+#########################################################
 
