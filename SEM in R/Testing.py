@@ -44,8 +44,8 @@ print(np.exp(full.params))
 # Coefficient p-values:
 print(full.pvalues)
 
-test = pd.concat([np.exp(full.params), full.pvalues], axis=1)
-test.columns = ["OddsRatio", "p-value"]
+results = pd.concat([np.exp(full.params), full.pvalues], axis=1)
+results.columns = ["OddsRatio", "p-value"]
 
 
 
