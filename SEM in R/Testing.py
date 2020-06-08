@@ -15,14 +15,16 @@ dataset = pd.read_csv("Subset.csv", header=0)
 
 dataset.shape
 dataset.columns
+dataset.info()
 #########################################################
 ###           3. Data Cleaning                        ###
+#########################################################
+
+#########################################################
+###           4. Training Split                       ###
 #########################################################
 X = dataset.drop(["Aincarceration"], axis=1)
 y = dataset["Aincarceration"]
 y.value_counts()
-
-
-
 
 
