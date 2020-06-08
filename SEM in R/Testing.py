@@ -35,7 +35,18 @@ y.value_counts()
 
 full = sm.Logit(y, X).fit()
 
+dir(full)
 print(full.summary())
 
 # Odds Ratios:
 print(np.exp(full.params))
+
+# Coefficient p-values:
+print(full.pvalues)
+
+test = pd.concat([np.exp(full.params), full.pvalues], axis=1)
+
+
+
+
+
