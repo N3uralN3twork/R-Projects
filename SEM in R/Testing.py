@@ -18,9 +18,9 @@ dataset.columns
 #########################################################
 ###           3. Data Cleaning                        ###
 #########################################################
-
-
-
+X = dataset.drop(["Aincarceration"], axis=1)
+y = dataset["Aincarceration"]
+y.value_counts()
 
 
 
