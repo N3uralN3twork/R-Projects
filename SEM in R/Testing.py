@@ -1,16 +1,27 @@
-###############################################################################
-###                     1.  Define Working Directory                        ###
-###############################################################################
+#########################################################
+###           1. Set the working directory            ###
+#########################################################
 import os
-import pandas as pd
-import numpy as np
 abspath = os.path.abspath("C:/Users/miqui/OneDrive/R Projects/SEM in R")
 os.chdir(abspath)
+#########################################################
+###           2. Import Data and Libraries            ###
+#########################################################
+import pandas as pd
+import numpy as np
+import statsmodels.formula.api as smf
 
-Services = pd.read_excel("ADAMHSCCNeedsAssessmentData20200522.xlsx", header=0)
+dataset = pd.read_spss("NLS 2 no formats.sav")
 
-Services.columns
+#########################################################
+###           3. Data Cleaning                        ###
+#########################################################
 
-test = Services.groupby("IndividualId", axis="columns")
+# Create 7 new variables:
+
+
+
+
+
 
 
