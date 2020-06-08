@@ -9,7 +9,6 @@ os.chdir(abspath)
 #########################################################
 import pandas as pd
 import numpy as np
-import statsmodels.formula.api as smf
 import statsmodels.api as sm
 
 dataset = pd.read_csv("Subset.csv", header=0)
@@ -47,6 +46,7 @@ print(full.pvalues)
 results = pd.concat([np.exp(full.params), full.pvalues], axis=1)
 results.columns = ["OddsRatio", "p-value"]
 
+print(results)
 
 
 
