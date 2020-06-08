@@ -11,13 +11,14 @@ import pandas as pd
 import numpy as np
 import statsmodels.formula.api as smf
 
-dataset = pd.read_spss("NLS 2 no formats.sav")
+dataset = pd.read_csv("Subset.csv", header=0)
 
+dataset.shape
+dataset.columns
 #########################################################
 ###           3. Data Cleaning                        ###
 #########################################################
 
-# Create 7 new variables:
 
 
 
