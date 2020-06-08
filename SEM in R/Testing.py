@@ -10,6 +10,7 @@ os.chdir(abspath)
 import pandas as pd
 import numpy as np
 import statsmodels.formula.api as smf
+import statsmodels.api as sm
 
 dataset = pd.read_csv("Subset.csv", header=0)
 
@@ -24,6 +25,7 @@ dataset.info()
 ###           4. Training Split                       ###
 #########################################################
 X = dataset.drop(["Aincarceration"], axis=1)
+X = sm.add_constant(X) # Don't forget to include the intercept
 y = dataset["Aincarceration"]
 y.value_counts()
 
@@ -31,3 +33,9 @@ y.value_counts()
 ###           5. Logistic Regression                  ###
 #########################################################
 
+full = sm.Logit(y, X).fit()
+
+print(full.summary())
+
+# Odds Ratios:
+print(np.exp(full.params))
