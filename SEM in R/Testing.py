@@ -41,12 +41,21 @@ formula = """Aincarceration ~ jail + victim + gunshotless12 + gunshot12to18 + un
 ###           5. Logistic Regression                  ###
 #########################################################
 
+# For all participants
 full = sm.Logit(y, X).fit()
 
 fit = smf.glm(formula=formula,
               data=dataset,
               family=sm.families.Binomial()).fit()
 
+# For females only
+fit = smf.glm(formula=formula,
+              data= dataset[dataset.gender == 0],
+              family=sm.families.Binomial()).fit()
+
+WF = smf.glm(formula = formula,
+             data = dataset[dataset.GR == 1],
+             family = sm.families.Binomial()).fit()
 #########################################################
 ###           6. Results                              ###
 #########################################################
