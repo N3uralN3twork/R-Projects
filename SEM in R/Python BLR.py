@@ -24,14 +24,61 @@ dataset.info()
 #########################################################
 
 # Select only the variables we want:
-
+dataset = dataset[['adultincarceration', 'jail', 'victim', 'gunshotless12',
+       'gunshot12to18', 'unemployment', 'homeless', 'poverty1997',
+       'poverty1998', 'poverty1999', 'poverty2000', 'poverty2001',
+       'poverty2002', 'death', 'hospitalization', 'divorce',
+       'juveniledestroyproperty', 'juvenilestealless', 'juvenilestealmore',
+       'juvenileotherproperty', 'juvenileattack', 'juvenileselldrugs',
+       'adultgun', 'adultdestroyproperty', 'adultstealless', 'adultstealmore',
+       'adultotherproperty', 'adultattack', 'adultselldrugs',
+       'elementarysuspend', 'middlesuspend', 'elementmiddledropout',
+       'highsuspend', 'highdropout', 'juvenileincarceration', 'highgrade15', 'gender',
+       'black', 'hispanic', 'age', 'twoparenthome', 'SES', 'citizenship',
+       'geography97', 'race']]
 
 # Create a new variable called GR for Gender-Race:
 
 def GR(df):
-    if df[""]
+    if df["gender"] == 0 and df["race"] == 1:
+        return "01"
+    elif df["gender"] == 0 and df["race"] == 2:
+        return "02"
+    elif df["gender"] == 0 and df["race"] == 3:
+        return "03"
+    elif df["gender"] == 0 and df["race"] == 4:
+        return "04"
+    elif df["gender"] == 1 and df["race"] == 1:
+        return "11"
+    elif df["gender"] == 1 and df["race"] == 2:
+        return "12"
+    elif df["gender"] == 1 and df["race"] == 3:
+        return "13"
+    elif df["gender"] == 1 and df["race"] == 4:
+        return "14"
+    else:
+        return "Error"
+
+dataset["GR"] = dataset.apply(GR, axis=1)
+dataset["GR"].value_counts()
 
 # Dichotomize adult, juvenile incarceration and suspensions
+
+def Aincarceration(df):
+    if df["adultincarceration"] == 0:
+        return 0
+    elif df["adultincarceration"] != 0:
+        return 1
+dataset["Aincarceration"] = dataset.apply(Aincarceration, axis=1)
+dataset["Aincarceration"].value_counts()
+
+def Jincarceration(df):
+    if df["juvenileincarceration"] == 0:
+        return 0
+    elif df["juvenileincarceration"] != 0:
+        return 1
+dataset["Jincarceration"] = dataset.apply(Jincarceration, axis=1)
+dataset["Jincarceration"].value_counts()
 
 
 #########################################################
