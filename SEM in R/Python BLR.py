@@ -80,6 +80,29 @@ def Jincarceration(df):
 dataset["Jincarceration"] = dataset.apply(Jincarceration, axis=1)
 dataset["Jincarceration"].value_counts()
 
+def ESuspend(df):
+    if df["elementarysuspend"] == 0:
+        return 0
+    elif df["elementarysuspend"] >= 1:
+        return 1
+dataset["ESuspend"] = dataset.apply(ESuspend, axis=1)
+dataset["ESuspend"].value_counts()
+
+def MSuspend(df):
+    if df["middlesuspend"] == 0:
+        return 0
+    elif df["middlesuspend"] >= 1:
+        return 1
+dataset["MSuspend"] = dataset.apply(MSuspend, axis=1)
+dataset["MSuspend"].value_counts()
+
+def HSuspend(df):
+    if df["highsuspend"] == 0:
+        return 0
+    elif df["highsuspend"] >= 1:
+        return 1
+dataset["HSuspend"] = dataset.apply(HSuspend, axis=1)
+dataset["HSuspend"].value_counts()
 
 #########################################################
 ###           4. Training Split                       ###
