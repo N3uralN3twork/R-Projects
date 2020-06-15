@@ -163,6 +163,9 @@ results.columns = ["OddsRatio", "p-value", "Lower", "Upper"]
 print(results)
 
 results = pd.concat([np.exp(females.params), females.pvalues, np.exp(females.conf_int())], axis=1)
+results = pd.DataFrame(results)
 results.columns = ["OddsRatio", "p-value", "Lower", "Upper"]
 print(results)
+print(results.columns)
 
+results[(results.Lower > 1) & (results.Upper > 1)]
