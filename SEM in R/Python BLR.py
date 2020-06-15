@@ -162,7 +162,7 @@ results = pd.concat([np.exp(full.params), full.pvalues, np.exp(full.conf_int())]
 results.columns = ["OddsRatio", "p-value", "Lower", "Upper"]
 print(results)
 
-results = pd.concat([np.exp(fit.params), fit.pvalues, np.exp(fit.conf_int())], axis=1)
+results = pd.concat([np.exp(females.params), females.pvalues, np.exp(females.conf_int())], axis=1)
 results.columns = ["OddsRatio", "p-value", "Lower", "Upper"]
 print(results)
 
