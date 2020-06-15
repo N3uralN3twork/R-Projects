@@ -168,4 +168,4 @@ results.columns = ["OddsRatio", "p-value", "Lower", "Upper"]
 print(results)
 print(results.columns)
 
-results[(results.Lower > 1) & (results.Upper > 1)]
+results[(results["p-value"] < 0.05)]
