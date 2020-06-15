@@ -12,7 +12,7 @@ import numpy as np
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 
-clean = pd.read_csv("Subset.csv", header=0) # Run this for ease of use
+dataset = pd.read_csv("Subset.csv", header=0) # Run this for ease of use
 dataset = pd.read_spss("NLS 2 no formats.sav")
 
 
@@ -104,6 +104,7 @@ def HSuspend(df):
 dataset["HSuspend"] = dataset.apply(HSuspend, axis=1)
 dataset["HSuspend"].value_counts()
 
+dataset.info()
 #########################################################
 ###           4. Training Split                       ###
 #########################################################
@@ -132,9 +133,9 @@ fit = smf.glm(formula=formula,
               family=sm.families.Binomial()).fit()
 
 # For females only
-fit = smf.glm(formula=formula,
-              data= dataset[dataset.gender == 0],
-              family=sm.families.Binomial()).fit()
+females = smf.glm(formula=formula,
+                  data= dataset[dataset.gender == 0],
+                  family=sm.families.Binomial()).fit()
 
 WF = smf.glm(formula = formula,
              data = dataset[dataset.GR == 1],
