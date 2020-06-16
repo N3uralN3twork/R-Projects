@@ -128,7 +128,7 @@ formula = """Aincarceration ~ jail + victim + gunshotless12 + gunshot12to18 + un
 # For all participants
 full = sm.Logit(y, X).fit()
 
-fit = smf.glm(formula=formula,
+full = smf.glm(formula=formula,
               data=dataset,
               family=sm.families.Binomial()).fit()
 
@@ -146,6 +146,7 @@ GR_fit = smf.glm(formula = formula,
 #########################################################
 dir(full)
 print(full.summary())
+print(full.summary2())
 print(full.conf_int())
 
 dir(females)

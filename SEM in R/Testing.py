@@ -4,7 +4,7 @@ formula = """Aincarceration ~ jail + victim + gunshotless12 + gunshot12to18 + un
     juvenilestealmore + juvenileotherproperty + juvenileattack + juvenileselldrugs + 
     adultgun + adultdestroyproperty + adultstealless + adultstealmore + adultotherproperty +
     adultattack + adultselldrugs + elementarysuspend + middlesuspend + elementmiddledropout +
-    highsuspend + highdropout + Jincarceration + highgrade15 + gender + black + age + 
+    highsuspend + highdropout + Jincarceration + highgrade15 + gender + black + hispanic + age + 
     twoparenthome + SES + citizenship + geography97"""
 
 dataset["GR"].value_counts()
@@ -13,7 +13,7 @@ GR_fit = smf.glm(formula = formula,
              family = sm.families.Binomial()).fit()
 
 print(GR_fit.summary())
-
+print(GR_fit.summary2())
 results = pd.concat([np.exp(GR_fit.params), GR_fit.pvalues, np.exp(GR_fit.conf_int())], axis=1)
 results = pd.DataFrame(results)
 results.columns = ["OddsRatio", "p-value", "Lower", "Upper"]
