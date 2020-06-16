@@ -139,7 +139,7 @@ males = smf.glm(formula=formula,
 
 dataset["GR"].value_counts()
 GR_fit = smf.glm(formula = formula,
-             data = dataset[dataset.GR == "11"],
+             data = dataset[dataset.GR == "02"],
              family = sm.families.Binomial()).fit()
 #########################################################
 ###           6. Results                              ###
