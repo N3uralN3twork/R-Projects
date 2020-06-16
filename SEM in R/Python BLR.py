@@ -133,12 +133,13 @@ fit = smf.glm(formula=formula,
               family=sm.families.Binomial()).fit()
 
 # For females only
-females = smf.glm(formula=formula,
-                  data= dataset[dataset["gender"] == 0],
+males = smf.glm(formula=formula,
+                  data= dataset[dataset["gender"] == 1],
                   family=sm.families.Binomial()).fit()
 
+dataset["GR"].value_counts()
 GR_fit = smf.glm(formula = formula,
-             data = dataset[dataset.GR == 1],
+             data = dataset[dataset.GR == "11"],
              family = sm.families.Binomial()).fit()
 #########################################################
 ###           6. Results                              ###
@@ -150,19 +151,23 @@ print(full.conf_int())
 dir(females)
 print(females.summary())
 print(females.summary2())
-# Odds Ratios:
-print(np.exp(full.params))
-print(np.exp(females.params))
+print(GR_fit.summary())
 
-# Coefficient p-values:
-print(full.pvalues)
-print(females.pvalues)
-
+# Full Dataset:
 results = pd.concat([np.exp(full.params), full.pvalues, np.exp(full.conf_int())], axis=1)
 results.columns = ["OddsRatio", "p-value", "Lower", "Upper"]
 print(results)
 
-results = pd.concat([np.exp(females.params), females.pvalues, np.exp(females.conf_int())], axis=1)
+# By Gender:
+results = pd.concat([np.exp(males.params), males.pvalues, np.exp(males.conf_int())], axis=1)
+results = pd.DataFrame(results)
+results.columns = ["OddsRatio", "p-value", "Lower", "Upper"]
+print(results)
+results[(results["p-value"] < 0.05)]
+
+# By Gender|Race:
+# Don't forget to check the if the number of observations line up correctly
+results = pd.concat([np.exp(GR_fit.params), GR_fit.pvalues, np.exp(GR_fit.conf_int())], axis=1)
 results = pd.DataFrame(results)
 results.columns = ["OddsRatio", "p-value", "Lower", "Upper"]
 print(results)
