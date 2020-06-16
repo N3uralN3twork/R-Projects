@@ -168,6 +168,7 @@ results[(results["p-value"] < 0.05)]
 
 # By Gender|Race:
 # Don't forget to check the if the number of observations line up correctly
+dataset["GR"].value_counts()
 results = pd.concat([np.exp(GR_fit.params), GR_fit.pvalues, np.exp(GR_fit.conf_int())], axis=1)
 results = pd.DataFrame(results)
 results.columns = ["OddsRatio", "p-value", "Lower", "Upper"]

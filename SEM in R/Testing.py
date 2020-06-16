@@ -4,12 +4,12 @@ formula = """Aincarceration ~ jail + victim + gunshotless12 + gunshot12to18 + un
     juvenilestealmore + juvenileotherproperty + juvenileattack + juvenileselldrugs + 
     adultgun + adultdestroyproperty + adultstealless + adultstealmore + adultotherproperty +
     adultattack + adultselldrugs + elementarysuspend + middlesuspend + elementmiddledropout +
-    highsuspend + highdropout + Jincarceration + highgrade15 + gender + black + hispanic + age + 
+    highsuspend + highdropout + Jincarceration + highgrade15 + gender + hispanic + age + 
     twoparenthome + SES + citizenship + geography97"""
 
 dataset["GR"].value_counts()
 GR_fit = smf.glm(formula = formula,
-             data = dataset[dataset.GR == "03"],
+             data = dataset[dataset.GR == "02"],
              family = sm.families.Binomial()).fit()
 
 print(GR_fit.summary())
@@ -18,4 +18,4 @@ results = pd.concat([np.exp(GR_fit.params), GR_fit.pvalues, np.exp(GR_fit.conf_i
 results = pd.DataFrame(results)
 results.columns = ["OddsRatio", "p-value", "Lower", "Upper"]
 print(results)
-results[(results["p-value"] < 0.05)]
+results[(results["p-value"] <= 0.05)]
