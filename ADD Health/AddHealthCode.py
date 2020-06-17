@@ -19,3 +19,4 @@ wave2["AID"].value_counts()
 
 "Merge waves by AID:"
 
+waves = wave1.merge(wave2, on=["AID"])
