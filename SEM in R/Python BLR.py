@@ -133,7 +133,7 @@ full = smf.glm(formula=formula,
               family=sm.families.Binomial()).fit()
 
 # For females only
-males = smf.glm(formula=formula,
+gender = smf.glm(formula=formula,
                   data= dataset[dataset["gender"] == 1],
                   family=sm.families.Binomial()).fit()
 
@@ -149,9 +149,9 @@ print(full.summary())
 print(full.summary2())
 print(full.conf_int())
 
-dir(females)
-print(females.summary())
-print(females.summary2())
+dir(gender)
+print(gender.summary())
+print(gender.summary2())
 print(GR_fit.summary())
 
 # Full Dataset:
@@ -160,7 +160,7 @@ results.columns = ["OddsRatio", "p-value", "Lower", "Upper"]
 print(results)
 
 # By Gender:
-results = pd.concat([np.exp(males.params), males.pvalues, np.exp(males.conf_int())], axis=1)
+results = pd.concat([np.exp(gender.params), gender.pvalues, np.exp(gender.conf_int())], axis=1)
 results = pd.DataFrame(results)
 results.columns = ["OddsRatio", "p-value", "Lower", "Upper"]
 print(results)
@@ -174,3 +174,12 @@ results = pd.DataFrame(results)
 results.columns = ["OddsRatio", "p-value", "Lower", "Upper"]
 print(results)
 results[(results["p-value"] < 0.05)]
+
+# AUC Score:
+males = dataset[dataset["gender"] == 1]
+y = males["Aincarceration"]
+X = males.drop(["Aincarceration", "GR"], axis=1)
+X = sm.add_constant(X)
+preds = gender.predict(X)
+from sklearn.metrics import roc_auc_score
+roc_auc_score(y_true=y, y_score=preds)

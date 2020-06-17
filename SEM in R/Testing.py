@@ -1,10 +1,12 @@
+import pandas as pd
+import numpy as np
 formula = """Aincarceration ~ jail + victim + gunshotless12 + gunshot12to18 + unemployment + homeless +
     poverty1997 + poverty1998 + poverty1999 + poverty2000 + poverty2001 + poverty2002 + 
     death + hospitalization + divorce + juveniledestroyproperty + juvenilestealless +
     juvenilestealmore + juvenileotherproperty + juvenileattack + juvenileselldrugs + 
     adultgun + adultdestroyproperty + adultstealless + adultstealmore + adultotherproperty +
     adultattack + adultselldrugs + elementarysuspend + middlesuspend + elementmiddledropout +
-    highsuspend + highdropout + Jincarceration + highgrade15 + gender + hispanic + age + 
+    highsuspend + highdropout + Jincarceration + highgrade15 + gender + black + hispanic + age + 
     twoparenthome + SES + citizenship + geography97"""
 
 dataset["GR"].value_counts()
