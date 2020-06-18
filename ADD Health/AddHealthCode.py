@@ -31,8 +31,8 @@ day = "3"
 month = "11"
 year = "95"
 
-
-
+date = [day, month, year]
+"-".join(date)
 
 
 
