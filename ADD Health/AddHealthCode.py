@@ -6,7 +6,7 @@ Date: 17 June 2020
 
 "Import the necessary libraries and data:"
 import pandas as pd
-import datetime
+from datetime import datetime, date
 
 wave1 = pd.read_csv("C:/Users/miqui/Downloads/ICPSR_21600-V21/ICPSR_21600/DS0001/21600-0001-Data.tsv",
                     sep="\t", verbose=1)
@@ -27,14 +27,13 @@ waves.info()
 
 "Calculate the Age variable:"
 
-day = "3"
-month = "11"
-year = "95"
+day = 3
+month = 11
+year = 1995
 
-date = [day, month, year]
-"-".join(date)
+Date = [day, month, year]
 
-
+Date = datetime(year, month, day)
 
 
 
