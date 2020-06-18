@@ -22,8 +22,19 @@ wave2["AID"].value_counts()
 
 waves = wave1.merge(wave2, on=["AID"])
 
-month = "6"
-day = "23"
+waves = waves[["AID", "IMONTH", "IDAY", "IYEAR", "H1GI1M", "H1GI1Y"]]
+waves.info()
+
+"Calculate the Age variable:"
+
+day = "3"
+month = "11"
 year = "95"
 
-date = day + "-" + month + "-" + year
+
+
+
+
+
+
+
