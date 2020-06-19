@@ -27,13 +27,5 @@ waves.info()
 
 "Calculate the Age variable:"
 
-day = 3
-month = 11
-year = 1995
-
-Date = [day, month, year]
-
-Date = datetime(year, month, day)
-
-
+waves["IYEAR"] = waves["IYEAR"] + 1900
 
