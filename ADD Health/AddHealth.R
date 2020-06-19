@@ -1,4 +1,7 @@
+"Sources: https://www.cpc.unc.edu/projects/addhealth/faqs/aboutdata/index.html#what-is-the-best"
+
 "Read in the data and necessary libraries:"
+setwd("C:/Users/miqui/OneDrive/R Projects/ADD Health")
 library(dplyr)
 library(lubridate)
 library(readr)
@@ -25,7 +28,8 @@ waves <- merge(wave1, wave2, by="AID")
 
 
 waves <- waves %>%
-          select(AID, IMONTH, IDAY, IYEAR, H1GI1M, H1GI1Y)
+          select(AID, IMONTH, IDAY, IYEAR, H1GI1M, H1GI1Y,
+                 H1GI4, H1GI6A, H1GI6B, H1GI6C, H1GI6D, H1GI6E)
 
 "Calculating the Age:"
 
@@ -40,3 +44,14 @@ waves <- waves %>%
 
 summary(waves$Age)
 
+"Calculating the Race:"
+waves <- waves %>%
+  mutate(Race = case_when(
+    H1GI4 == 1 ~ "Hispanic",
+    H1GI6B == 1 ~ "Black",
+    H1GI6D == 1 ~ "Asian",
+    H1GI6C == 1 ~ "NativeAmerican",
+    H1GI6E == 1 ~ "Other",
+    H1GI6A == 1 ~ "White"))
+
+table(waves$Race)

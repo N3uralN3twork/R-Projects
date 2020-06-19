@@ -6,7 +6,7 @@ Date: 17 June 2020
 
 "Import the necessary libraries and data:"
 import pandas as pd
-from datetime import datetime, date
+from datetime import datetime
 
 wave1 = pd.read_csv("C:/Users/miqui/Downloads/ICPSR_21600-V21/ICPSR_21600/DS0001/21600-0001-Data.tsv",
                     sep="\t", verbose=1)
@@ -26,6 +26,18 @@ waves = waves[["AID", "IMONTH", "IDAY", "IYEAR", "H1GI1M", "H1GI1Y"]]
 waves.info()
 
 "Calculate the Age variable:"
-
 waves["IYEAR"] = waves["IYEAR"] + 1900
+waves = waves.astype({"IMONTH":str, "IDAY":str, "IYEAR":str})
+waves["DATE"] = waves["IMONTH"] + waves["IDAY"] + waves["IYEAR"]
+waves["IDATE"] = waves["IDATE"].apply(lambda x: pd.to_datetime(str(x), format="%m%d%Y"))
+
+waves["BDATE"] = waves["H1GI1M"] + "15" + waves["H1GI1Y"]
+waves["BDATE"] = waves["BDATE"].apply(lambda x: pd.to_datetime(str(x), format="%m%d%yy"))
+
+
+
+
+
+
+
 
