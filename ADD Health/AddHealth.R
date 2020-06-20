@@ -5,19 +5,26 @@ setwd("C:/Users/miqui/OneDrive/R Projects/ADD Health")
 library(dplyr)
 library(lubridate)
 library(readr)
-wave1 <- read_delim("C:/Users/miqui/Downloads/ICPSR_21600-V21/ICPSR_21600/DS0001/21600-0001-Data.tsv", 
-                    "\t", escape_double = FALSE, trim_ws = TRUE)
+wave1 <- read_delim("Wave1.tsv", "\t", escape_double = FALSE, 
+                    trim_ws = TRUE)
 View(wave1)
 
+
 library(readr)
-wave2 <- read_delim("C:/Users/miqui/Downloads/ICPSR_21600-Wave2/ICPSR_21600/DS0005/21600-0005-Data.tsv", 
-                    "\t", escape_double = FALSE, trim_ws = TRUE)
+wave2 <- read_delim("Wave2.tsv", "\t", escape_double = FALSE, 
+                    trim_ws = TRUE)
 View(wave2)
+
+library(readr)
+wave3 <- read_delim("Wave3.tsv", "\t", escape_double = FALSE, 
+                    trim_ws = TRUE)
+View(wave3)
 
 " Turn into data-frames:"
 
 wave1 <- as.data.frame(wave1)
 wave2 <- as.data.frame(wave2)
+wave3 <- as.data.frame(wave3)
 
 table(unique(wave1$AID))
 table(is.na(wave1$AID))
@@ -25,7 +32,7 @@ table(is.na(wave1$AID))
 "Merge waves by AID:"
 
 waves <- merge(wave1, wave2, by="AID")
-
+waves <- merge(waves, wave3, by="AID")
 
 waves <- waves %>%
           select(AID, IMONTH, IDAY, IYEAR, H1GI1M, H1GI1Y,
