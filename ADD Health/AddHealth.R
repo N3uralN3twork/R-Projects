@@ -35,10 +35,6 @@ waves <- merge(wave1, wave2, by="AID")
 waves <- merge(waves, wave3, by="AID")
 variables <- as.data.frame(names(waves))
 
-waves <- waves %>%
-          select(AID, IMONTH, IDAY, IYEAR, H1GI1M, H1GI1Y,
-                 H1GI4, H1GI6A, H1GI6B, H1GI6C, H1GI6D, H1GI6E)
-
 "Calculating the Age:"
 
 waves <- waves %>% 
@@ -63,3 +59,41 @@ waves <- waves %>%
     H1GI6A == 1 ~ "White"))
 
 table(waves$Race)
+
+table(PA12)
+table(is.na(PA12))
+
+"Parent's Highest Education:"
+# 0 = missing/refused
+# 1 = HS or less
+# 2 = some college / trade school
+# 3 = College or higher
+# 4 = Other
+
+waves <- waves %>%
+  mutate(PEducation = case_when(
+    is.na(PA12) ~ 0,
+    PA12 == 96 ~ 0,
+    PA12 %in% c(1,2,3, 4,5,10) ~ 1,
+    PA12 %in% c(6,7,8) ~ 2,
+    PA12 == 9 ~ 3))
+
+table(waves$PEducation)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
