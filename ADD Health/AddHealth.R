@@ -33,6 +33,7 @@ table(is.na(wave1$AID))
 
 waves <- merge(wave1, wave2, by="AID")
 waves <- merge(waves, wave3, by="AID")
+variables <- as.data.frame(names(waves))
 
 waves <- waves %>%
           select(AID, IMONTH, IDAY, IYEAR, H1GI1M, H1GI1Y,
