@@ -16,15 +16,21 @@ wave2 <- read_delim("Wave2.tsv", "\t", escape_double = FALSE,
 View(wave2)
 
 library(readr)
-wave3 <- read_delim("Wave3.tsv", "\t", escape_double = FALSE, 
-                    trim_ws = TRUE)
+wave3 <- read_delim("Wave3.tsv", "\t", 
+                    escape_double = FALSE, trim_ws = TRUE)
 View(wave3)
+
+library(readr)
+wave4 <- read_delim("Wave4.tsv", "\t", escape_double = FALSE, 
+                    trim_ws = TRUE)
+View(wave4)
 
 "Turn into data-frames:"
 
 wave1 <- as.data.frame(wave1)
 wave2 <- as.data.frame(wave2)
 wave3 <- as.data.frame(wave3)
+wave4 <- as.data.frame(wave4)
 
 table(unique(wave1$AID))
 table(is.na(wave1$AID))
@@ -33,7 +39,7 @@ table(is.na(wave1$AID))
 
 waves <- merge(wave1, wave2, by="AID")
 waves <- merge(waves, wave3, by="AID")
-variables <- as.data.frame(names(waves))
+waves <- merge(waves, wave4, by="AID")
 
 "Calculating the Age:"
 
@@ -80,18 +86,32 @@ waves <- waves %>%
 
 table(waves$PEducation)
 
+variables <- as.data.frame(names(waves))
 
+"Select only the necessary variables:"
+attach(waves)
+Waves <- waves %>%
+  select(AID, PA10, PA12, S1, S6B, S2, S4, IMONTH, IDAY, IYEAR,
+         H1GI1Y, H1GI6B, H1GI11, H1GI14, H1GI21, H1IR12, H1FV3,
+         H1GI4, H1JO11, H1DS5, H1DS2, H1TO53, H1DS12, H1DS13, H1DS9,
+         H2GI10, H2IR12, H2FV1, H2DS10, H2DS11,
+         H3DS8, H3OD4B, BIO_SEX3, H3HR24, H3HR25, H3ID32, H3ID30,
+         H3ID29, H3CJ5, H3DS16, H3CJ108A, H3LM7,
+         H4DS8, H4CJ9I, H4DS1, H4DS19, H4CJ25M, H4DS5, H4DS6, H4DS2,
+         H4WP28, H4CJ20, H4ED2, H4CJ1, H4CJ17, H4CJ24M, H4LM11,
+         PEducation, Race, Age)
+attach(Waves)
 
-
-
-
-
-
-
-
-
-
-
+"Descriptive Statistics:"
+table(Waves$BIO_SEX3)
+table(Race)
+Waves %>%
+  group_by(BIO_SEX3) %>%
+  summarize(mean = mean(Age, na.rm = TRUE),
+            sd = sd(Age, na.rm = TRUE),
+            median = median(Age, nana.rm = TRUE),
+            IQR = IQR(Age, na.rm = TRUE))
+ 
 
 
 
