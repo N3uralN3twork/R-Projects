@@ -488,6 +488,7 @@ JIAge <- glm(
 
 summary(JIAge)
 nagelkerke(JIAge)
+exp(coef(JIAge))
 
 # Adult Incarceration via Juvenile Incarceration
 
