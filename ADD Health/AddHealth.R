@@ -166,6 +166,41 @@ waves <- waves %>%
 table(waves$P1Education, waves$P2Education)
 table(waves$SES)
 
+"Two Parent Home"
+
+# 0 = No
+# 1 = Yes/Legitimate Skip
+# NA =  NA/Refused
+
+table(waves$S11)
+table(waves$S17)
+
+waves <- waves %>%
+  mutate(Mother = case_when(
+    is.na(S11) ~ NaN,
+    S11 == 9 ~ NaN,
+    S11 == 0 ~ 0,
+    S11 == 1 ~ 1)) %>%
+  mutate(Father = case_when(
+    is.na(S17) ~ NaN,
+    S17 == 9 ~ NaN,
+    S17 == 0 ~ 0,
+    S17 == 1 ~ 1)) %>%
+  mutate(TwoParentHome = case_when(
+    is.na(Mother) & is.na(Father) ~ NaN,
+    is.na(Mother) & Father == 0 ~ NaN,
+    is.na(Mother) & Father == 1 ~ NaN,
+    Mother == 0 & is.na(Father) ~ NaN,
+    Mother == 0 & Father == 0 ~ 0,
+    Mother == 0 & Father == 1 ~ 0,
+    Mother == 1 & is.na(Father) ~ NaN,
+    Mother == 1 & Father == 0 ~ 0,
+    Mother == 1 & Father == 1 ~ 1))
+
+table(waves$Mother, waves$Father)
+table(is.na(waves$Mother), is.na(waves$Father))
+table(waves$TwoParentHome)
+
 "Divorce:"
 # 0 = Single/Married/Widowed
 # 1 = Divorced/Separated
@@ -289,7 +324,7 @@ Waves <- waves %>%
          H4DS8, H4CJ9I, H4DS1, H4DS19, H4CJ25M, H4DS5, H4DS6, H4DS2,
          H4WP28, H4CJ20, H4ED2, H4CJ1, H4CJ6, H4CJ17, H4CJ24M, H4LM11,
          PEducation, Race, Age, Geography, Gender, Hispanic, Citizenship, 
-         Divorce, JIncarceration, AIncarceration, FirstIncarcAge,
+         Divorce, JIncarceration, AIncarceration, FirstIncarcAge, TwoParentHome,
          P1Education, P2Education, SES, JIncarceMonths, AIncarceMonths)
 attach(Waves)
 
@@ -403,6 +438,12 @@ round(prop.table(table(Divorce))*100, 1)
 table(Gender, Divorce)
 round(prop.table(table(Gender, Divorce), margin = 1)*100, 1)
 
+# Two Parent Home
+table(TwoParentHome)
+round(prop.table(table(TwoParentHome))*100, 1)
+table(Gender, TwoParentHome)
+round(prop.table(table(Gender, TwoParentHome), margin = 1)*100, 1)
+
 # Geography
 table(Geography)
 round(prop.table(table(Geography))*100, 1)
@@ -424,6 +465,8 @@ round(prop.table(table(Gender, AIncarceration), margin = 1)*100, 1)
 ###############################
 ###    Regression Models    ###
 ###############################
+
+"Logistic Regression Models:"
 
 table(AIncarceration)
 table(JIncarceration)
