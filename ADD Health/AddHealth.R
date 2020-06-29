@@ -1,3 +1,4 @@
+#####
 "Sources: https://www.cpc.unc.edu/projects/addhealth/faqs/aboutdata/index.html#what-is-the-best"
 
 "Read in the data and necessary libraries:"
@@ -80,7 +81,7 @@ waves <- waves %>%
 table(H4CJ24Y)
 table(H4CJ24M)
 table(waves$JIncarceMonths)
-
+summary(waves$JIncarceMonths)
 
 
 "Months Incarcerated as an Adult:"
@@ -101,26 +102,27 @@ waves <- waves %>%
 table(H4CJ25Y)
 table(H4CJ25M)
 table(waves$AIncarceMonths)
+summary(waves$AIncarceMonths)
 
 "Calculating the Race:"
 
 waves <- waves %>%
   mutate(Race = case_when(
     H1GI4 == 1 ~ "Hispanic",
-    H1GI6B == 1 ~ "Black",
+    S6B == 1 ~ "Black",
     H1GI6D == 1 ~ "Asian",
     H1GI6C == 1 ~ "NativeAmerican",
     H1GI6E == 1 ~ "Other",
     H1GI6A == 1 ~ "White"))
 
 table(waves$Race)
-
+table(is.na(waves$Race))
 table(PA12)
 table(is.na(PA12))
 
 "Parent's Highest Education:"
 
-# 0 = missing/refused
+# NA = missing/refused
 # 1 = HS or less
 # 2 = some college / trade school
 # 3 = College or higher
@@ -134,6 +136,7 @@ waves <- waves %>%
     PA12 %in% c(8, 9) ~ 3))
 
 table(waves$PEducation)
+table(is.na(waves$PEducation))
 
 "SES:"
 
@@ -241,6 +244,7 @@ waves <- waves %>%
     BIO_SEX3 == 2 ~ "Female"))
 
 table(waves$Gender)
+table(is.na(waves$Gender))
 
 "Hispanic:"
 # 0 = No
@@ -258,6 +262,7 @@ waves <- waves %>%
     H1GI4 == 1 ~ 1))
 
 table(waves$Hispanic)
+table(is.na(waves$Hispanic))
 
 "Citizenship"
 
@@ -276,6 +281,275 @@ waves <- waves %>%
     H1GI14 == 7 ~ 1))
 
 table(waves$Citizenship)
+table(is.na(waves$Citizenship))
+
+"Employed as an Adult:"
+
+# Wave 3 respondents between 18 and 24 years old
+# 0 = No
+# 1 = Yes
+# NA = NA/Not applicable/Refused
+
+table(waves$H3DA28)
+table(is.na(waves$H3DA28))
+waves <- waves %>%
+  mutate(AEmployed = case_when(
+    is.na(H3DA28) ~ NaN,
+    H3DA28 %in% c(6,8,9) ~ NaN,
+    H3DA28 == 0 ~ 0,
+    H3DA28 == 1 ~ 1))
+
+table(waves$AEmployed)
+
+"Does your mother have a job?"
+
+# 0 = no job
+# 1 = any type of job
+# NA = NA/Not Applicable/Refused/Don't Know/No Mother
+
+table(waves$H1RM4)
+
+waves <- waves %>%
+  mutate(MotherEmployed = case_when(
+    is.na(H1RM4) ~ NaN,
+    H1RM4 %in% c(96, 97, 98, 99) ~ NaN,
+    H1RM4 == 16 ~ 0,
+    H1RM4 %in% seq(1,15) ~ 1))
+
+table(waves$MotherEmployed)
+table(is.na(waves$MotherEmployed))
+
+"Does your father have a job?"
+
+# 0 = no job
+# 1 = any type of job
+# NA = NA/Not Applicable/Refused/Don't Know/No Father
+
+table(waves$H1RF4)
+
+waves <- waves %>%
+  mutate(FatherEmployed = case_when(
+    is.na(H1RF4) ~ NaN,
+    H1RF4 %in% c(96, 97, 98, 99) ~ NaN,
+    H1RF4 == 16 ~ 0,
+    H1RF4 %in% seq(1,15) ~ 1))
+
+table(waves$FatherEmployed)
+table(is.na(waves$FatherEmployed))
+
+"Unemployment:"
+
+# 0 = Yes, both parents unemployed
+# 1 = At least 1 parent has a job
+# NA = NA
+
+waves <- waves %>%
+  mutate(Unemployment = case_when(
+    is.na(MotherEmployed) & is.na(FatherEmployed) ~ NaN,
+    is.na(MotherEmployed) & FatherEmployed == 0 ~ NaN,
+    MotherEmployed == 0 & is.na(FatherEmployed) ~ NaN,
+    MotherEmployed == 1 | FatherEmployed == 1 ~ 0,
+    MotherEmployed == 0 & FatherEmployed == 0 ~ 1))
+
+table(waves$MotherEmployed, waves$FatherEmployed)
+table(is.na(waves$MotherEmployed), is.na(waves$FatherEmployed))
+table(waves$Unemployment)
+table(is.na(waves$Unemployment))
+
+"Mother's Hours Work per Week:"
+
+# NA = 0/Refused/Not Applicable/No Dad
+# [1-168] = [1-168]
+# 40 = Don't Know
+
+table(waves$H1RM7)
+table(is.na(waves$H1RM7))
+
+waves <- waves %>%
+  mutate(MotherHoursHolder = replace(H1RM7, H1RM7 %in% c(NA, 996, 997, 999), NA)) %>%
+  mutate(MotherHoursWeek = replace(MotherHoursHolder, MotherHoursHolder == 998, 40))
+
+table(waves$MotherEmployed, waves$H1RM7)
+table(is.na(waves$MotherHoursHolder))
+summary(waves$MotherHoursWeek)
+
+"Father's Hours Work per Week:"
+
+# NA = 0/Refused/Not Applicable/No Dad
+# [1-168] = [1-168]
+# 40 = Don't Know
+
+table(waves$H1RF7)
+table(is.na(waves$H1RF7))
+
+waves <- waves %>%
+  mutate(FatherHoursHolder = replace(H1RF7, H1RF7 %in% c(NA, 996, 997, 999), NA)) %>%
+  mutate(FatherHoursWeek = replace(FatherHoursHolder, FatherHoursHolder == 998, 40))
+
+table(waves$FatherEmployed, waves$H1RF7)
+table(is.na(waves$FatherHoursHolder))
+summary(waves$FatherHoursWeek)
+
+"Mother Regular Overtime?"
+
+# 0 = No
+# 1 = Yes, usually over 40 hours per week
+
+waves <- waves %>%
+  mutate(MotherOvertime = case_when(
+    is.na(MotherHoursWeek) ~ NaN,
+    MotherHoursWeek <= 40 ~ 0,
+    MotherHoursWeek > 40 ~ 1))
+
+table(waves$MotherOvertime)
+table(is.na(waves$MotherOvertime))
+
+"Father Regular Overtime?"
+
+# 0 = No
+# 1 = Yes, usually over 40 hours per week
+
+waves <- waves %>%
+  mutate(FatherOvertime = case_when(
+    is.na(FatherHoursWeek) ~ NaN,
+    FatherHoursWeek <= 40 ~ 0,
+    FatherHoursWeek > 40 ~ 1))
+
+table(waves$FatherOvertime)
+table(is.na(waves$FatherOvertime))
+
+"W1 Grade:"
+
+table(waves$S3) # What grade are you in?
+table(waves$H1GI20) # What grade are you in?
+table(is.na(waves$H1GI20))
+
+waves <- waves %>%
+  mutate(W1Grade = replace(H1GI20, H1GI20 %in% c(NA, 96, 97, 98, 99), NaN))
+
+table(waves$W1Grade)
+table(is.na(waves$W1Grade))
+
+"W1 Grade Level:"
+
+waves <- waves %>%
+  mutate(W1GradeLevel = case_when(
+    W1Grade %in% c(7,8) ~ "Middle",
+    W1Grade %in% c(9,10,11,12) ~ "High"))
+
+table(waves$W1GradeLevel)
+table(waves$W1Grade)
+
+"W2 Grade:"
+
+# 7-12
+# 13 = Beyond High School
+# NA = NA/Not in School/Don't Know/No Grades
+
+table(waves$H2GI9) # What grade are you in?
+
+waves <- waves %>%
+  mutate(W2Grade = replace(H2GI9, H2GI9 %in% c(NA, 14, 97, 98), NA))
+
+table(waves$W2Grade)
+table(is.na(waves$W2Grade))
+
+"W2 Grade Level:"
+
+waves <- waves %>%
+  mutate(W2GradeLevel = case_when(
+    W2Grade %in% c(7,8) ~ "Middle",
+    W2Grade %in% c(9,10,11,12) ~ "High",
+    W2Grade == 13 ~ "Beyond"))
+
+table(waves$W2GradeLevel)
+table(waves$W2Grade)
+
+"Have you ever Dropped out of school?:"
+
+# Have they ever dropped out of school for any reason?
+
+# 0 = In School/Graduated/Suspended-Expelled
+# 1 = Dropped Out/Sick-Injured/On Leave/Pregnant
+# NA = NA/Don't Know/Refused/Other
+
+table(waves$H1GI21)
+table(waves$H2GI10)
+
+waves <- waves %>%
+  mutate(DropHolder1 = replace(H1GI21, H1GI21 %in% c(6, 96, 98), NA)) %>%
+  mutate(DropHolder2 = replace(H2GI10, H2GI10 %in% c(8), NA)) %>%
+  mutate(Dropout = case_when(
+    
+    DropHolder1 == 1 & DropHolder2 == 1 ~ 0,
+    DropHolder1 == 1 & DropHolder2 == 2 ~ 0,
+    DropHolder1 == 1 & DropHolder2 == 3 ~ 1,
+    DropHolder1 == 1 & DropHolder2 == 4 ~ 1,
+    DropHolder1 == 1 & DropHolder2 == 5 ~ 1,
+    DropHolder1 == 1 & DropHolder2 == 6 ~ 0,
+    DropHolder1 == 1 & DropHolder2 == 7 ~ 1,
+    DropHolder1 == 1 & DropHolder2 == 97 ~ 0,
+    DropHolder1 == 2 & is.na(DropHolder2) ~ 0,
+    
+    DropHolder1 == 2 ~ 1,
+    
+    DropHolder1 == 3 ~ 1,
+    
+    DropHolder1 == 4 ~ 0,
+    
+    DropHolder1 == 5 ~ 1,
+    
+    DropHolder1 == 97 & DropHolder2 == 1 ~ 0,
+    DropHolder1 == 97 & DropHolder2 == 2 ~ 0,
+    DropHolder1 == 97 & DropHolder2 == 3 ~ 1,
+    DropHolder1 == 97 & DropHolder2 == 4 ~ 1,
+    DropHolder1 == 97 & DropHolder2 == 5 ~ 1,
+    DropHolder1 == 97 & DropHolder2 == 6 ~ 0,
+    DropHolder1 == 97 & DropHolder2 == 7 ~ 1,
+    DropHolder1 == 97 & DropHolder2 == 97 ~ 0,
+    DropHolder1 == 97 & is.na(DropHolder2) ~ 0,
+    
+    is.na(DropHolder1) & DropHolder2 == 1 ~ NaN,
+    is.na(DropHolder1) & DropHolder2 == 2 ~ NaN,
+    is.na(DropHolder1) & DropHolder2 == 3 ~ 1,
+    is.na(DropHolder1) & DropHolder2 == 4 ~ 1,
+    is.na(DropHolder1) & DropHolder2 == 5 ~ 1,
+    is.na(DropHolder1) & DropHolder2 == 6 ~ NaN,
+    is.na(DropHolder1) & DropHolder2 == 7 ~ 1,
+    is.na(DropHolder1) & DropHolder2 == 97 ~ NaN,
+    is.na(DropHolder1) & is.na(DropHolder2) ~ NaN,
+    TRUE ~ 0))
+
+table(waves$DropHolder1)
+table(waves$DropHolder2)
+table(waves$DropHolder1, waves$DropHolder2)
+table(waves$Dropout)
+
+"Middle School Dropout:"
+
+
+table(waves$W1GradeLevel, waves$Dropout)
+table(waves$W2GradeLevel, waves$Dropout)
+
+
+waves <- waves %>%
+  mutate(MiddleDropout = case_when(
+    W1GradeLevel == "Middle" & Dropout == 1 ~ 1,
+    W2GradeLevel == "Middle" & Dropout == 1 ~ 1,
+    TRUE ~ 0))
+
+table(waves$MiddleDropout)
+
+"High School Dropout:"
+
+waves <- waves %>%
+  mutate(HighDropout = case_when(
+    W1GradeLevel == "High" & Dropout == 1 ~ 1,
+    W2GradeLevel == "High" & Dropout == 1 ~ 1,
+    TRUE ~ 0))
+
+table(waves$HighDropout)
+
 
 "Juvenile Incarceration:"
 
@@ -318,14 +592,17 @@ Waves <- waves %>%
   select(AID, PA10, PA12, S1, S6B, S2, S4, IMONTH, IDAY, IYEAR,
          H1GI1Y, H1GI6B, H1GI11, H1GI14, H1GI21, H1IR12, H1FV3,
          H1GI4, H1JO11, H1DS5, H1DS2, H1TO53, H1DS12, H1DS13, H1DS9,
-         H2GI10, H2IR12, H2FV1, H2DS10, H2DS11,
+         H2GI10, H2IR12, H2FV1, H2DS10, H2DS11, H3DA31,
          H3DS8, H3OD4B, BIO_SEX3, H3HR24, H3HR25, H3ID32,
          H3ID30, H3ID29, H3CJ5, H3DS16, H3CJ108A, H3LM7,
          H4DS8, H4CJ9I, H4DS1, H4DS19, H4CJ25M, H4DS5, H4DS6, H4DS2,
          H4WP28, H4CJ20, H4ED2, H4CJ1, H4CJ6, H4CJ17, H4CJ24M, H4LM11,
          PEducation, Race, Age, Geography, Gender, Hispanic, Citizenship, 
          Divorce, JIncarceration, AIncarceration, FirstIncarcAge, TwoParentHome,
-         P1Education, P2Education, SES, JIncarceMonths, AIncarceMonths)
+         P1Education, P2Education, SES, JIncarceMonths, AIncarceMonths, AEmployed,
+         MotherEmployed, FatherEmployed, Unemployment, MotherHoursWeek, FatherHoursWeek,
+         MotherOvertime, FatherOvertime, W1Grade, W1GradeLevel, W2Grade, W2GradeLevel,
+         Dropout, MiddleDropout, HighDropout)
 attach(Waves)
 
 "Rename some of the variables:"
@@ -390,6 +667,29 @@ Waves %>%
             median = median(AIncarceMonths, na.rm = TRUE),
             IQR = IQR(AIncarceMonths, na.rm = TRUE))
 
+# Mother's Hours worked per Week
+summary(Waves$MotherHoursWeek)
+sd(Waves$MotherHoursWeek, na.rm = TRUE)
+
+Waves %>%
+  group_by(Gender) %>%
+  summarize(mean = mean(MotherHoursWeek, na.rm = TRUE),
+            sd = sd(MotherHoursWeek, na.rm = TRUE),
+            median = median(MotherHoursWeek, na.rm = TRUE),
+            IQR = IQR(MotherHoursWeek, na.rm = TRUE))
+
+# Father's Hours worked per Week
+summary(Waves$FatherHoursWeek)
+sd(Waves$FatherHoursWeek, na.rm = TRUE)
+
+Waves %>%
+  group_by(Gender) %>%
+  summarize(mean = mean(FatherHoursWeek, na.rm = TRUE),
+            sd = sd(FatherHoursWeek, na.rm = TRUE),
+            median = median(FatherHoursWeek, na.rm = TRUE),
+            IQR = IQR(FatherHoursWeek, na.rm = TRUE))
+
+
 "Categorical Variables:" 
 
 # Gender
@@ -450,6 +750,85 @@ round(prop.table(table(Geography))*100, 1)
 table(Gender, Geography)
 round(prop.table(table(Gender, Geography), margin = 1)*100, 1)
 
+# Employed as an Adult
+table(AEmployed)
+round(prop.table(table(AEmployed))*100, 1)
+table(Gender, AEmployed)
+round(prop.table(table(Gender, AEmployed), margin = 1)*100, 1)
+
+# Mother has a Job
+table(MotherEmployed)
+round(prop.table(table(MotherEmployed))*100, 1)
+table(Gender, MotherEmployed)
+round(prop.table(table(Gender, MotherEmployed), margin = 1)*100, 1)
+
+# Father has a Job
+table(FatherEmployed)
+round(prop.table(table(FatherEmployed))*100, 1)
+table(Gender, FatherEmployed)
+round(prop.table(table(Gender, FatherEmployed), margin = 1)*100, 1)
+
+# Father Overtime
+table(FatherOvertime)
+round(prop.table(table(FatherOvertime))*100, 1)
+table(Gender, FatherOvertime)
+round(prop.table(table(Gender, FatherOvertime), margin = 1)*100, 1)
+
+# Mother Overtime
+table(MotherOvertime)
+round(prop.table(table(MotherOvertime))*100, 1)
+table(Gender, MotherOvertime)
+round(prop.table(table(Gender, MotherOvertime), margin = 1)*100, 1)
+
+# Unemployment
+table(Unemployment)
+round(prop.table(table(Unemployment))*100, 1)
+table(Gender, Unemployment)
+round(prop.table(table(Gender, Unemployment), margin = 1)*100, 1)
+
+# Grade @ Wave 1
+table(W1Grade)
+round(prop.table(table(W1Grade))*100, 1)
+table(Gender, W1Grade)
+round(prop.table(table(Gender, W1Grade), margin = 1)*100, 1)
+
+# Middle School or High School @ Wave 1
+table(W1GradeLevel)
+round(prop.table(table(W1GradeLevel))*100, 1)
+table(Gender, W1GradeLevel)
+round(prop.table(table(Gender, W1GradeLevel), margin = 1)*100, 1)
+
+# Grade @ Wave 2
+table(W2Grade)
+round(prop.table(table(W2Grade))*100, 1)
+table(Gender, W2Grade)
+round(prop.table(table(Gender, W2Grade), margin = 1)*100, 1)
+
+# Middle School or High School @ Wave 2
+table(W2GradeLevel)
+round(prop.table(table(W2GradeLevel))*100, 1)
+table(Gender, W2GradeLevel)
+round(prop.table(table(Gender, W2GradeLevel), margin = 1)*100, 1)
+
+# Have they ever dropped out of school?
+table(Dropout)
+round(prop.table(table(Dropout))*100, 1)
+table(Gender, Dropout)
+round(prop.table(table(Gender, Dropout), margin = 1)*100, 1)
+
+# Did they dropout of middle school?
+table(MiddleDropout)
+round(prop.table(table(MiddleDropout))*100, 1)
+table(Gender, MiddleDropout)
+round(prop.table(table(Gender, MiddleDropout), margin = 1)*100, 1)
+
+# Did they dropout of high school?
+table(HighDropout)
+round(prop.table(table(HighDropout))*100, 1)
+table(Gender, HighDropout)
+round(prop.table(table(Gender, HighDropout), margin = 1)*100, 1)
+
+
 # Juvenile Incarceration
 table(JIncarceration)
 round(prop.table(table(JIncarceration))*100, 1)
@@ -502,3 +881,39 @@ exp(coef(AIJI))
 "Odds of being incarcerated as an adult are 10.27 times higher 
 if you were incarcerated as a juvenile."
 
+# Juvenile Incarceration via Hours Worked per Father
+
+JIHoursWeek <- glm(
+  JIncarceration ~ FatherHoursWeek,
+  data = Waves,
+  family = binomial(link = "logit"))
+
+summary(JIHoursWeek)
+
+# Adult Incarceration via Hours Worked
+
+AIHoursWeek <- glm(
+  AIncarceration ~ MotherHoursWeek + FatherHoursWeek,
+  data = Waves,
+  family = binomial(link = "logit"))
+
+summary(AIHoursWeek)
+exp(coef(AIHoursWeek))
+
+# Juvenile Incarceration via Overtime
+
+JIOvertime <- glm(
+  JIncarceration ~ MotherOvertime + FatherOvertime,
+  data = Waves,
+  family = binomial(link = "logit"))
+
+summary(JIOvertime)
+
+# Adult Incarceration via Overtime
+
+AIOvertime <- glm(
+  AIncarceration ~ MotherOvertime + FatherOvertime,
+  data = Waves,
+  family = binomial(link = "logit"))
+
+summary(AIOvertime)
