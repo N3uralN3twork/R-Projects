@@ -551,6 +551,50 @@ waves <- waves %>%
 table(waves$HighDropout)
 
 
+"Family Size:"
+
+# 1 = Lives by self
+# 6 = 6 or more people
+
+table(waves$S27)
+
+waves <- waves %>%
+  mutate(FamilySize = replace(S27, S27 %in% c(7, 99), NA))
+table(waves$FamilySize)
+
+"Death:"
+
+# 0 = no parent has died
+# 1 = a parent has died
+
+table(waves$H1NM3)
+table(waves$H1NF3)
+
+waves <- waves %>%
+  mutate(MotherHolder = replace(H1NM3, H1NM3 %in% c(NA, 96, 98), NA)) %>%
+  mutate(MotherAlive = case_when(
+    MotherHolder %in% seq(0, 18) ~ 0,
+    MotherHolder == 97 ~ 1))
+
+waves <- waves %>%
+  mutate(FatherHolder = replace(H1NF3, H1NF3 %in% c(NA, 98), NA)) %>%
+  mutate(FatherAlive = case_when(
+    FatherHolder %in% seq(0, 18) ~ 0,
+    FatherHolder == 97 ~ 1))
+
+table(waves$MotherAlive)
+table(waves$FatherAlive)
+
+waves <- waves %>%
+  mutate(Death = case_when(
+    is.na(MotherAlive) ~ NaN,
+    is.na(FatherAlive) ~ NaN,
+    MotherAlive == 0 ~ 1,
+    FatherAlive == 0 ~ 1,
+    MotherAlive == 1 & FatherAlive == 1 ~ 0))
+
+table(waves$Death)
+
 "Juvenile Incarceration:"
 
 # 0 = No
@@ -602,7 +646,7 @@ Waves <- waves %>%
          P1Education, P2Education, SES, JIncarceMonths, AIncarceMonths, AEmployed,
          MotherEmployed, FatherEmployed, Unemployment, MotherHoursWeek, FatherHoursWeek,
          MotherOvertime, FatherOvertime, W1Grade, W1GradeLevel, W2Grade, W2GradeLevel,
-         Dropout, MiddleDropout, HighDropout)
+         Dropout, MiddleDropout, HighDropout, FamilySize, Death)
 attach(Waves)
 
 "Rename some of the variables:"
@@ -828,6 +872,17 @@ round(prop.table(table(HighDropout))*100, 1)
 table(Gender, HighDropout)
 round(prop.table(table(Gender, HighDropout), margin = 1)*100, 1)
 
+# Family Size
+table(FamilySize)
+round(prop.table(table(FamilySize))*100, 1)
+table(Gender, FamilySize)
+round(prop.table(table(Gender, FamilySize), margin = 1)*100, 1)
+
+# Has either parent died?
+table(Death)
+round(prop.table(table(Death))*100, 1)
+table(Gender, Death)
+round(prop.table(table(Gender, Death), margin = 1)*100, 1)
 
 # Juvenile Incarceration
 table(JIncarceration)
@@ -917,3 +972,16 @@ AIOvertime <- glm(
   family = binomial(link = "logit"))
 
 summary(AIOvertime)
+
+# Juvenile Incarceration via Two Parent Home
+
+JITwoParent <- glm(
+  JIncarceration ~ TwoParentHome,
+  data = waves,
+  family = binomial(link = "logit"))
+
+summary(JITwoParent)
+exp(coef(JITwoParent))
+
+"Odds of being incarcerated as a juvenile is 2.7 times smaller if
+you live in a two parent home."
