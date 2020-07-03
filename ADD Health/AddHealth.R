@@ -111,10 +111,12 @@ waves <- waves %>%
     H1GI4 == 1 ~ "Hispanic",
     S6B == 1 ~ "Black",
     H1GI6D == 1 ~ "Asian",
-    H1GI6C == 1 ~ "NativeAmerican",
+    H1GI6C == 1 ~ "Other",
     H1GI6E == 1 ~ "Other",
     H1GI6A == 1 ~ "White"))
 
+waves$Race <- as.factor(waves$Race)
+waves <- within(waves, Race <- relevel(Race, ref="White")) # Set "White" as the reference group
 table(waves$Race)
 table(is.na(waves$Race))
 table(PA12)
@@ -465,92 +467,6 @@ waves <- waves %>%
 table(waves$W2GradeLevel)
 table(waves$W2Grade)
 
-"Have you ever Dropped out of school?:"
-
-# Have they ever dropped out of school for any reason?
-
-# 0 = In School/Graduated/Suspended-Expelled
-# 1 = Dropped Out/Sick-Injured/On Leave/Pregnant
-# NA = NA/Don't Know/Refused/Other
-
-table(waves$H1GI21)
-table(waves$H2GI10)
-
-waves <- waves %>%
-  mutate(DropHolder1 = replace(H1GI21, H1GI21 %in% c(6, 96, 98), NA)) %>%
-  mutate(DropHolder2 = replace(H2GI10, H2GI10 %in% c(8), NA)) %>%
-  mutate(Dropout = case_when(
-    
-    DropHolder1 == 1 & DropHolder2 == 1 ~ 0,
-    DropHolder1 == 1 & DropHolder2 == 2 ~ 0,
-    DropHolder1 == 1 & DropHolder2 == 3 ~ 1,
-    DropHolder1 == 1 & DropHolder2 == 4 ~ 1,
-    DropHolder1 == 1 & DropHolder2 == 5 ~ 1,
-    DropHolder1 == 1 & DropHolder2 == 6 ~ 0,
-    DropHolder1 == 1 & DropHolder2 == 7 ~ 1,
-    DropHolder1 == 1 & DropHolder2 == 97 ~ 0,
-    DropHolder1 == 2 & is.na(DropHolder2) ~ 0,
-    
-    DropHolder1 == 2 ~ 1,
-    
-    DropHolder1 == 3 ~ 1,
-    
-    DropHolder1 == 4 ~ 0,
-    
-    DropHolder1 == 5 ~ 1,
-    
-    DropHolder1 == 97 & DropHolder2 == 1 ~ 0,
-    DropHolder1 == 97 & DropHolder2 == 2 ~ 0,
-    DropHolder1 == 97 & DropHolder2 == 3 ~ 1,
-    DropHolder1 == 97 & DropHolder2 == 4 ~ 1,
-    DropHolder1 == 97 & DropHolder2 == 5 ~ 1,
-    DropHolder1 == 97 & DropHolder2 == 6 ~ 0,
-    DropHolder1 == 97 & DropHolder2 == 7 ~ 1,
-    DropHolder1 == 97 & DropHolder2 == 97 ~ 0,
-    DropHolder1 == 97 & is.na(DropHolder2) ~ 0,
-    
-    is.na(DropHolder1) & DropHolder2 == 1 ~ NaN,
-    is.na(DropHolder1) & DropHolder2 == 2 ~ NaN,
-    is.na(DropHolder1) & DropHolder2 == 3 ~ 1,
-    is.na(DropHolder1) & DropHolder2 == 4 ~ 1,
-    is.na(DropHolder1) & DropHolder2 == 5 ~ 1,
-    is.na(DropHolder1) & DropHolder2 == 6 ~ NaN,
-    is.na(DropHolder1) & DropHolder2 == 7 ~ 1,
-    is.na(DropHolder1) & DropHolder2 == 97 ~ NaN,
-    is.na(DropHolder1) & is.na(DropHolder2) ~ NaN,
-    TRUE ~ 0))
-
-table(waves$DropHolder1)
-table(waves$DropHolder2)
-table(waves$DropHolder1, waves$DropHolder2)
-table(waves$Dropout)
-
-"Middle School Dropout:"
-
-
-table(waves$W1GradeLevel, waves$Dropout)
-table(waves$W2GradeLevel, waves$Dropout)
-
-
-waves <- waves %>%
-  mutate(MiddleDropout = case_when(
-    W1GradeLevel == "Middle" & Dropout == 1 ~ 1,
-    W2GradeLevel == "Middle" & Dropout == 1 ~ 1,
-    TRUE ~ 0))
-
-table(waves$MiddleDropout)
-
-"High School Dropout:"
-
-waves <- waves %>%
-  mutate(HighDropout = case_when(
-    W1GradeLevel == "High" & Dropout == 1 ~ 1,
-    W2GradeLevel == "High" & Dropout == 1 ~ 1,
-    TRUE ~ 0))
-
-table(waves$HighDropout)
-
-
 "Family Size:"
 
 # 1 = Lives by self
@@ -594,6 +510,47 @@ waves <- waves %>%
     MotherAlive == 1 & FatherAlive == 1 ~ 0))
 
 table(waves$Death)
+
+"Highest Grade Completed:"
+
+# Continuous
+# Only middle school and above
+# Anything higher than grade 12 is grade 12
+
+table(highgrade15)
+
+
+table(waves$H3ED1)
+
+waves <- waves %>%
+  mutate(HighestGrade = replace(H3ED1, H3ED1 %in% c(97, 98, 99), NA)) %>%
+  mutate(HighGrade15 = replace(HighestGrade, HighestGrade %in% c(13,14,15,16,17,18,19,20,21,22), 12))
+
+table(waves$HighestGrade)
+table(waves$HighGrade15)
+
+"Did you dropout of Middle School?:"
+# 0 = No
+# 1 = Yes
+
+table(waves$HighGrade15)
+
+waves <- waves %>%
+  mutate(MiddleDropout = case_when(
+    is.na(HighGrade15) ~ NaN,
+    HighGrade15 %in% c(6,7) ~ 1,
+    TRUE ~ 0))
+
+table(waves$MiddleDropout)
+
+"Did you drop out of High School"
+waves <- waves %>%
+  mutate(HighDropout = case_when(
+    is.na(HighGrade15) ~ NaN,
+    HighGrade15 %in% c(8,9,10,11) ~ 1,
+    TRUE ~ 0))
+
+table(waves$HighDropout)
 
 "Juvenile Incarceration:"
 
@@ -646,7 +603,7 @@ Waves <- waves %>%
          P1Education, P2Education, SES, JIncarceMonths, AIncarceMonths, AEmployed,
          MotherEmployed, FatherEmployed, Unemployment, MotherHoursWeek, FatherHoursWeek,
          MotherOvertime, FatherOvertime, W1Grade, W1GradeLevel, W2Grade, W2GradeLevel,
-         Dropout, MiddleDropout, HighDropout, FamilySize, Death)
+         Dropout, MiddleDropout, HighDropout, FamilySize, Death, HighestGrade, HighGrade15)
 attach(Waves)
 
 "Rename some of the variables:"
@@ -733,6 +690,27 @@ Waves %>%
             median = median(FatherHoursWeek, na.rm = TRUE),
             IQR = IQR(FatherHoursWeek, na.rm = TRUE))
 
+# Highest Grade Completed Capped
+summary(Waves$HighGrade15)
+sd(Waves$HighGrade15, na.rm = TRUE)
+
+Waves %>%
+  group_by(Gender) %>%
+  summarize(mean = mean(HighGrade15, na.rm = TRUE),
+            sd = sd(HighGrade15, na.rm = TRUE),
+            median = median(HighGrade15, na.rm = TRUE),
+            IQR = IQR(HighGrade15, na.rm = TRUE))
+
+# Highest Grade Completed Uncapped
+summary(Waves$HighestGrade)
+sd(Waves$HighestGrade, na.rm = TRUE)
+
+Waves %>%
+  group_by(Gender) %>%
+  summarize(mean = mean(HighestGrade, na.rm = TRUE),
+            sd = sd(HighestGrade, na.rm = TRUE),
+            median = median(HighestGrade, na.rm = TRUE),
+            IQR = IQR(HighestGrade, na.rm = TRUE))
 
 "Categorical Variables:" 
 
@@ -927,12 +905,13 @@ exp(coef(JIAge))
 # Adult Incarceration via Juvenile Incarceration
 
 AIJI <- glm(
-  AIncarceration ~ JIncarceration,
+  AIncarceration ~ JIncarceration + Age + Gender + Race,
   data = Waves,
   family = binomial(link = "logit"))
 
 summary(AIJI)
 exp(coef(AIJI))
+exp(confint(AIJI))
 "Odds of being incarcerated as an adult are 10.27 times higher 
 if you were incarcerated as a juvenile."
 
@@ -985,3 +964,24 @@ exp(coef(JITwoParent))
 
 "Odds of being incarcerated as a juvenile is 2.7 times smaller if
 you live in a two parent home."
+
+AIHighGrade <- glm(
+  AIncarceration ~ HighestGrade,
+  data = Waves,
+  family = binomial(link = "logit"))
+
+summary(AIHighGrade)
+exp(coef(AIHighGrade))
+
+"For every grade you complete, the odds of being
+incarcerated as an adult decrease by 1.4 times."
+
+AIRace <- glm(
+  AIncarceration ~ Race,
+  data = Waves,
+  family = binomial(link = "logit"))
+
+summary(AIRace)
+exp(coef(AIRace))
+
+
