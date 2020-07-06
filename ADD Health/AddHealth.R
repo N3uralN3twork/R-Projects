@@ -1,4 +1,6 @@
-#####
+###############################
+### Load Data and Libraries ###
+###############################
 "Sources: https://www.cpc.unc.edu/projects/addhealth/faqs/aboutdata/index.html#what-is-the-best"
 
 "Read in the data and necessary libraries:"
@@ -7,6 +9,8 @@ library(dplyr)
 library(lubridate)
 library(rcompanion)
 library(readr)
+library(lavaan)
+library(psych)
 wave1 <- read_delim("Wave1.tsv", "\t", escape_double = FALSE, 
                     trim_ws = TRUE)
 View(wave1)
@@ -543,7 +547,7 @@ waves <- waves %>%
 
 table(waves$MiddleDropout)
 
-"Did you drop out of High School"
+"Did you drop out of High School?:"
 waves <- waves %>%
   mutate(HighDropout = case_when(
     is.na(HighGrade15) ~ NaN,
@@ -551,6 +555,335 @@ waves <- waves %>%
     TRUE ~ 0))
 
 table(waves$HighDropout)
+
+"Have you ever been suspended?"
+
+# 0 = No
+# 1 = Yes
+
+table(waves$H1ED7)
+
+waves <- waves %>%
+  mutate(EverSuspend = replace(H1ED7, H1ED7 %in% c(6, 8), NA))
+
+table(waves$EverSuspend)
+
+"Grade of Last Suspension:"
+
+table(waves$H1ED8)
+table(waves$EverSuspend, waves$H1ED8)
+
+waves <- waves %>%
+  mutate(SuspendGrade = replace(H1ED8, H1ED8 %in% c(96, 97, 98, 99), NA))
+
+table(waves$SuspendGrade)
+
+"Elementary School Suspend:"
+
+# 0 = No
+# 1 = Yes
+
+waves <- waves %>%
+  mutate(ESuspend = case_when(
+    SuspendGrade %in% seq(1, 5) ~ 1,
+    TRUE ~ 0))
+
+table(waves$ESuspend)
+
+"Middle School Suspend:"
+
+# 0 = No
+# 1 = Yes
+
+waves <- waves %>%
+  mutate(MSuspend = case_when(
+    SuspendGrade %in% c(6, 7, 8) ~ 1,
+    TRUE ~ 0))
+
+table(waves$MSuspend)
+
+"High School Suspend:"
+
+# 0 = No
+# 1 = Yes
+
+waves <- waves %>%
+  mutate(HSuspend = case_when(
+    SuspendGrade %in% c(9, 10, 11, 12) ~ 1,
+    TRUE ~ 0))
+
+table(waves$HSuspend)
+
+"Expulsion from School:"
+
+# 0 = No
+# 1 = Yes
+
+table(waves$H1ED9)
+
+waves <- waves %>%
+  mutate(Expel = replace(H1ED9, H1ED9 %in% c(6, 8), NA))
+
+table(waves$Expel)
+
+
+"Aggressive Delinquency (AD):"
+
+# 0 = Never
+# 1 = Once
+# 2 = More than once
+
+# 1. Getting into a serious physical fight
+# 2. Pulling a knife/gun on someone
+# 3. Shooting or stabbing someone
+
+table(waves$H1DS5) # Serious physical fight
+table(waves$H1FV7) # Pulling a knife/gun on someone
+table(waves$H1FV8) # Shooting or stabbing someone
+
+# 0 = Zero days
+# 1 = One day
+# 2 = Two or Three days
+# 3 = Four or Five days
+# 4 = Six or more days
+
+table(waves$H1FV9) # Carrying a weapon to school
+
+"Non-aggressive Delinquency (NAD):"
+
+# 0 = Never
+# 1 = 1 or 2 times
+# 2 = 3 or 4 times
+# 3 = 5 or more times
+
+# 1. Lying about whereabouts
+# 2. Shoplifting
+# 3. Stealing less than $50
+# 4. Stealing more than $50
+
+table(waves$H1DS3) # Lying about whereabouts
+table(waves$H1DS4) # Shoplifting
+table(waves$H1DS13) # Stealing less than $50
+table(waves$H1DS9) # Stealing more than $50
+
+"Fixing the variables to remove Refused/Don't Know/Not Applicable"
+
+waves <- waves %>%
+  mutate(ADPhysicalFight = replace(H1DS5, H1DS5 %in% c(6,8,9), NA)) %>%
+  mutate(ADKnifeGun = replace(H1FV7, H1FV7 %in% c(6,8,9), NA)) %>%
+  mutate(ADShootStab = replace(H1FV8, H1FV8 %in% c(6,8,9), NA)) %>%
+  mutate(ADWeaponSchool = replace(H1FV9, H1FV9 %in% c(6,8,9), NA)) %>%
+  mutate(NADLying = replace(H1DS5, H1DS5 %in% c(6,8,9), NA)) %>%
+  mutate(NADShoplift = replace(H1DS4, H1DS4 %in% c(6,8,9), NA)) %>%
+  mutate(NADStealLess = replace(H1DS13, H1DS13 %in% c(6,8,9), NA)) %>%
+  mutate(NADStealMore = replace(H1DS9, H1DS9 %in% c(6,8,9), NA))
+
+# Aggressive Delinquency
+table(waves$ADPhysicalFight)
+table(waves$ADKnifeGun)
+table(waves$ADShootStab)
+table(waves$ADWeaponSchool)
+
+# Non-aggressive Delinquency
+table(waves$NADLying)
+table(waves$NADShoplift)
+table(waves$NADStealLess)
+table(waves$NADStealMore)
+
+"Creating Generalized Delinquency Variables:"
+
+
+# Just sum them up for a general delinquency score?
+# Max possible aggressive delinquency is 16
+# Max possible non-aggressive delinquency score is 12
+
+waves <- waves %>%
+  mutate(AggDelinq = ADPhysicalFight + ADKnifeGun + ADShootStab + ADWeaponSchool) %>%
+  mutate(NonAggDelinq = NADLying + NADShoplift + NADStealLess + NADStealMore)
+
+table(waves$AggDelinq)
+table(waves$NonAggDelinq)  
+
+###############################
+###  Attachment to Parents  ###
+###############################
+"Attachment to parents (AtP):"
+
+# 1 = Not at all
+# 5 = Very much
+
+# 1. How close do you feel to your mother?
+# 2. How close do you feel to your father?
+# 3. How much do you think she cares about you?
+# 4. How much do you think he cares about you?
+
+table(waves$H1WP9) # Close to mother
+table(waves$H1WP13) # Close to father
+table(waves$H1WP10) # Mother cares about you
+table(waves$H1WP14) # Father cares about you
+
+"Fixing the variables to remove Refused/Don't Know/Not Applicable:"
+
+waves <- waves %>%
+  mutate(AtPCloseMother = replace(H1WP9, H1WP9 %in% c(6, 7, 8, 9), NA)) %>%
+  mutate(AtPCloseFather = replace(H1WP13, H1WP13 %in% c(6, 7, 8, 9), NA)) %>%
+  mutate(AtPMotherCare = replace(H1WP10, H1WP10 %in% c(6, 7, 8, 9), NA)) %>%
+  mutate(AtPFatherCare = replace(H1WP14, H1WP14 %in% c(6, 7, 8, 9), NA))
+
+
+table(waves$AtPCloseMother)  
+table(waves$AtPCloseFather)
+table(waves$AtPMotherCare)
+table(waves$AtPFatherCare)
+
+"Create the Attachment to Parents variable:"
+
+waves <- waves %>%
+  mutate(AttachParents = AtPCloseMother + AtPCloseFather + AtPMotherCare + AtPFatherCare)
+
+table(waves$AttachParents)
+
+
+###############################
+###  Attachment to School   ###
+###############################
+"Attachment to School (AtS):"
+
+# Note: You have to reverse the order of the responses (6-i)
+
+# 1 = Not at all
+# 5 = Very much
+
+# 1. I feel close to people at school
+# 2. I am happy to be at school
+# 3. The teachers treat students fairly
+# 4. I feel like I am part of the school
+
+table(waves$H1ED19) # Close to people at school
+table(waves$H1ED22) # Happy to be at school
+table(waves$H1ED23) # Treat students fairly
+table(waves$H1ED20) # Part of the school
+
+
+"Fixing the variables to remove Refused/Don't Know/Not Applicable:"
+
+waves <- waves %>%
+  mutate(AtSClose = replace(H1ED19, H1ED19 %in% c(6, 7, 8), NA)) %>%
+  mutate(AtSHappy = replace(H1ED22, H1ED22 %in% c(6, 7, 8), NA)) %>%
+  mutate(AtSFairly = replace(H1ED23, H1ED23 %in% c(6, 7, 8), NA)) %>%
+  mutate(AtSPartOf = replace(H1ED20, H1ED20 %in% c(6, 7, 8), NA))
+
+# Reversing the Likert scale:
+
+waves <- waves %>%
+  mutate(AtSClose = 6-AtSClose) %>%
+  mutate(AtSHappy = 6-AtSHappy) %>%
+  mutate(AtSFairly = 6-AtSFairly) %>%
+  mutate(AtSPartOf = 6-AtSPartOf)
+
+# Attachment to School
+table(waves$AtSClose)
+table(waves$AtSHappy)
+table(waves$AtSFairly)
+table(waves$AtSPartOf)
+
+
+
+##########################################
+###  Attachment to Delinquent Peers   ###
+##########################################
+
+"Attachment to Delinquent Peers (AtDP):"
+
+# Asked to 3 best friends of the respondent
+
+# 0 = Zero friends
+# 3 = All 3 friends
+
+# 6-9 = NA
+
+# 1. Smoke at least 1 cigarette a day
+# 2. Drank alcohol at least once per month
+# 3. Used marijuana at least once per month
+
+table(waves$H1TO9)  # Cigarette
+table(waves$H1TO29) # Alcohol
+table(waves$H1TO33) # Marijuana
+
+waves <- waves %>%
+  mutate(AtDPCigs = replace(H1TO9, H1TO9 %in% c(6, 8, 9), NA)) %>%
+  mutate(AtDPAlcohol = replace(H1TO29, H1TO29 %in% c(6, 8, 9), NA)) %>%
+  mutate(AtDPWeed = replace(H1TO33, H1TO33 %in% c(6, 8, 9), NA))
+
+# Attachment to Delinquent Peers
+table(waves$AtDPCigs)
+table(waves$AtDPAlcohol)
+table(waves$AtDPWeed)
+
+"Creating the Attachment to Delinquent Peers variable:"
+
+waves <- waves %>%
+  mutate(AtDelinqPeers = AtDPCigs + AtDPAlcohol + AtDPWeed)
+
+table(waves$AtDelinqPeers)
+
+
+
+###############################
+###  Academic Performance   ###
+###############################
+
+"Academic Performance (AP):"
+
+# 1 = D
+# 2 = C
+# 3 = B
+# 4 = A
+
+
+# 1. Grade in English/Language Arts
+# 2. Grade in Mathematics
+# 3. Grade in History/Social Studies
+# 4. Grade in Science
+
+table(waves$H1ED11) # English
+table(waves$H1ED12) # Math
+table(waves$H1ED13) # History
+table(waves$H1ED14) # Science
+
+
+"Fixing the variables to remove Refused/Don't Know/Not Applicable/Other:"
+
+waves <- waves %>%
+  mutate(APEnglish = replace(H1ED11, H1ED11 %in% c(5, 6, 96, 97, 98, 99), NA)) %>%
+  mutate(APMath = replace(H1ED12, H1ED12 %in% c(5, 6, 96, 97, 98, 99), NA)) %>%
+  mutate(APHistory = replace(H1ED13, H1ED13 %in% c(5, 6, 96, 97, 98, 99), NA)) %>%
+  mutate(APScience = replace(H1ED14, H1ED14 %in% c(5, 6, 96, 97, 98, 99), NA))
+
+# Academic Performance:
+table(waves$APEnglish)
+table(waves$APMath)
+table(waves$APHistory)
+table(waves$APScience)
+
+"Reversing the grading:"
+
+waves <- waves %>%
+  mutate(APEnglish = 5-APEnglish,
+         APMath = 5-APMath,
+         APHistory = 5-APHistory,
+         APScience = 5-APScience)
+
+# Academic Performance:
+table(waves$APEnglish)
+table(waves$APMath)
+table(waves$APHistory)
+table(waves$APScience)
+
+waves <- waves %>%
+  mutate(AcadPerform = APEnglish + APMath + APHistory + APScience)
+
+summary(waves$AcadPerform)
 
 "Juvenile Incarceration:"
 
@@ -597,13 +930,25 @@ Waves <- waves %>%
          H3DS8, H3OD4B, BIO_SEX3, H3HR24, H3HR25, H3ID32,
          H3ID30, H3ID29, H3CJ5, H3DS16, H3CJ108A, H3LM7,
          H4DS8, H4CJ9I, H4DS1, H4DS19, H4CJ25M, H4DS5, H4DS6, H4DS2,
-         H4WP28, H4CJ20, H4ED2, H4CJ1, H4CJ6, H4CJ17, H4CJ24M, H4LM11,
-         PEducation, Race, Age, Geography, Gender, Hispanic, Citizenship, 
+         H4WP28, H4CJ20, H4ED2, H4CJ1, H4CJ6, H4CJ17, H4CJ24M, H4LM11, H1FV7, H1FV8, 
+         H1FV9, H1DS5, H1DS4, H1DS13, H1DS9,
+         H1WP9, H1WP13, H1WP10, H1WP14, H1ED19,
+         H1ED20, H1ED22, H1ED23, H1TO33, H1TO9,
+         H1TO29, H1ED11, H1ED12, H1ED13, H1ED14,
+         PEducation, Race, Age, Geography, Gender, Hispanic, Citizenship, EverSuspend, 
          Divorce, JIncarceration, AIncarceration, FirstIncarcAge, TwoParentHome,
          P1Education, P2Education, SES, JIncarceMonths, AIncarceMonths, AEmployed,
          MotherEmployed, FatherEmployed, Unemployment, MotherHoursWeek, FatherHoursWeek,
          MotherOvertime, FatherOvertime, W1Grade, W1GradeLevel, W2Grade, W2GradeLevel,
-         Dropout, MiddleDropout, HighDropout, FamilySize, Death, HighestGrade, HighGrade15)
+         MiddleDropout, HighDropout, FamilySize, Death, HighestGrade, HighGrade15,
+         SuspendGrade, ESuspend, MSuspend, HSuspend, Expel, ADPhysicalFight, ADKnifeGun, 
+         ADShootStab, ADWeaponSchool, NADLying, NADShoplift, 
+         NADStealLess, NADStealMore, AtPCloseMother,
+         AtPCloseFather, AtPMotherCare, AtPFatherCare,
+         AtSClose, AtSHappy, AtSPartOf, AtSFairly,
+         AtDPCigs, AtDPAlcohol, AtDPWeed, APEnglish,
+         APMath, APHistory, APScience, AggDelinq,
+         NonAggDelinq, AttachParents, AtDelinqPeers, AcadPerform)
 attach(Waves)
 
 "Rename some of the variables:"
@@ -615,13 +960,10 @@ Waves <- Waves %>%
 
 names(Waves)
 
-###############################
-### Descriptive Statistics  ###
-###############################
+##############################
+### Descriptive Statistics ###
+##############################
 str(Waves)
-
-table(Waves$BIO_SEX3)
-table(Race)
 
 "Continuous Variables:" 
 
@@ -691,7 +1033,7 @@ Waves %>%
             IQR = IQR(FatherHoursWeek, na.rm = TRUE))
 
 # Highest Grade Completed Capped
-summary(Waves$HighGrade15)
+summary(HighGrade15)
 sd(Waves$HighGrade15, na.rm = TRUE)
 
 Waves %>%
@@ -702,7 +1044,7 @@ Waves %>%
             IQR = IQR(HighGrade15, na.rm = TRUE))
 
 # Highest Grade Completed Uncapped
-summary(Waves$HighestGrade)
+summary(HighestGrade)
 sd(Waves$HighestGrade, na.rm = TRUE)
 
 Waves %>%
@@ -711,6 +1053,28 @@ Waves %>%
             sd = sd(HighestGrade, na.rm = TRUE),
             median = median(HighestGrade, na.rm = TRUE),
             IQR = IQR(HighestGrade, na.rm = TRUE))
+
+# Grade of Last Suspension
+summary(SuspendGrade)
+sd(Waves$SuspendGrade, na.rm = TRUE)
+
+Waves %>%
+  group_by(Gender) %>%
+  summarize(mean = mean(SuspendGrade, na.rm = TRUE),
+            sd = sd(SuspendGrade, na.rm = TRUE),
+            median = median(SuspendGrade, na.rm = TRUE),
+            IQR = IQR(SuspendGrade, na.rm = TRUE))
+
+# Academic Performance
+summary(AcadPerform)
+sd(Waves$AcadPerform, na.rm = TRUE)
+
+Waves %>%
+  group_by(Gender) %>%
+  summarize(mean = mean(AcadPerform, na.rm = TRUE),
+            sd = sd(AcadPerform, na.rm = TRUE),
+            median = median(AcadPerform, na.rm = TRUE),
+            IQR = IQR(AcadPerform, na.rm = TRUE))
 
 "Categorical Variables:" 
 
@@ -832,12 +1196,6 @@ round(prop.table(table(W2GradeLevel))*100, 1)
 table(Gender, W2GradeLevel)
 round(prop.table(table(Gender, W2GradeLevel), margin = 1)*100, 1)
 
-# Have they ever dropped out of school?
-table(Dropout)
-round(prop.table(table(Dropout))*100, 1)
-table(Gender, Dropout)
-round(prop.table(table(Gender, Dropout), margin = 1)*100, 1)
-
 # Did they dropout of middle school?
 table(MiddleDropout)
 round(prop.table(table(MiddleDropout))*100, 1)
@@ -862,6 +1220,36 @@ round(prop.table(table(Death))*100, 1)
 table(Gender, Death)
 round(prop.table(table(Gender, Death), margin = 1)*100, 1)
 
+# Have you ever been suspended?
+table(EverSuspend)
+round(prop.table(table(EverSuspend))*100, 1)
+table(Gender, EverSuspend)
+round(prop.table(table(Gender, EverSuspend), margin = 1)*100, 1)
+
+# Were you suspended in elementary school?
+table(ESuspend)
+round(prop.table(table(ESuspend))*100, 1)
+table(Gender, ESuspend)
+round(prop.table(table(Gender, ESuspend), margin = 1)*100, 1)
+
+# Were you suspended in middle school?
+table(MSuspend)
+round(prop.table(table(MSuspend))*100, 1)
+table(Gender, MSuspend)
+round(prop.table(table(Gender, MSuspend), margin = 1)*100, 1)
+
+# Were you suspended in high school?
+table(HSuspend)
+round(prop.table(table(HSuspend))*100, 1)
+table(Gender, HSuspend)
+round(prop.table(table(Gender, HSuspend), margin = 1)*100, 1)
+
+# Have you ever been expelled from school?
+table(Expel)
+round(prop.table(table(Expel))*100, 1)
+table(Gender, Expel)
+round(prop.table(table(Gender, Expel), margin = 1)*100, 1)
+
 # Juvenile Incarceration
 table(JIncarceration)
 round(prop.table(table(JIncarceration))*100, 1)
@@ -873,6 +1261,92 @@ table(AIncarceration)
 round(prop.table(table(AIncarceration))*100, 1)
 table(Gender, AIncarceration)
 round(prop.table(table(Gender, AIncarceration), margin = 1)*100, 1)
+
+
+####################################
+### Confirmatory Factor Analysis ###
+####################################
+
+"Both fa and cfa give very similar results in terms of metrics
+I included both for reference"
+
+"Confirmatory Factor Analysis:"
+
+# Aggressive Delinquency
+AD.model <- 
+  "
+  # Latent Variables
+  AD =~ ADPhysicalFight + ADKnifeGun + ADShootStab + ADWeaponSchool
+  "
+
+fit <- cfa(AD.model, data = Waves, std.lv=TRUE)
+summary(fit, fit.measures=TRUE, standardized=TRUE)
+
+# Non-aggressive Delinquency
+NAD.model <- 
+  "
+  # Latent Variables
+  NAD =~ NADLying + NADShoplift + NADStealLess + NADStealMore
+  "
+
+fit1 <- cfa(NAD.model, data = Waves, std.lv=TRUE)
+summary(fit1, fit.measures=TRUE, standardized=TRUE)
+
+# Attachment to Parents
+AtParent.model <-
+  "
+  # Latent Variables
+  AParent =~ AtPCloseMother + AtPCloseFather + AtPMotherCare + AtPFatherCare
+  "
+
+fit2 <- cfa(AtParent.model, data = Waves, std.lv=TRUE)
+summary(fit1, fit.measures=TRUE, standardized=TRUE)
+
+
+# Attachment to Delinquent Peers
+AtDPeers.model <-
+  "
+  # Latent variables
+  ADPeers =~ AtDPCigs + AtDPAlcohol + AtDPWeed
+  "
+
+fit3 <- cfa(AtDPeers.model, data = Waves, std.lv=TRUE)
+summary(fit3, fit.measures=TRUE, standardized=TRUE)
+
+# Or
+
+DelinqPeers <- Waves %>%
+  select(AtDPCigs, AtDPAlcohol, AtDPWeed)
+
+solution <- fa(DelinqPeers, nfactors = 1)
+solution
+
+# Academic Performance
+AP.model <- 
+  "
+  APerform =~ APEnglish + APMath + APHistory + APScience
+  "
+
+fit4 <- cfa(AP.model, data = Waves, std.lv=TRUE)
+summary(fit4, fit.measures=TRUE, standardized=TRUE)
+
+# Or 
+
+Academic <- Waves %>%
+  select(APEnglish, APMath, APHistory, APScience)
+
+solution <- fa(Academic, nfactors = 1)
+print(solution)
+print(solution$scores)
+
+"From the above CFA, it looks like the paper used appropriate constructs
+to describe:
+  Aggressive Delinquency
+  Non-aggressive Delinquency
+  Attachment to Parents
+  Attachment to Delinquent Peers
+  Academic Performance"
+
 
 ###############################
 ###    Regression Models    ###
@@ -984,4 +1458,52 @@ AIRace <- glm(
 summary(AIRace)
 exp(coef(AIRace))
 
+# JIncarceration by Suspension status:
+
+JISuspend <- glm(
+  JIncarceration ~ EverSuspend,
+  data = Waves,
+  family = binomial(link = "logit"))
+
+summary(JISuspend)
+
+"The odds of being incarcerated as a juvenile are 3.9 times 
+higher if you have ever been suspended."
+
+# AIncarceration by Suspension status:
+
+AISuspend <- glm(
+  AIncarceration ~ EverSuspend,
+  data = Waves,
+  family = binomial(link = "logit"))
+
+summary(AISuspend)
+exp(coef(AISuspend))
+
+"The odds of being incarcerated as an adult are 5.6 times 
+higher if you have ever been suspended."
+
+# JIncarceration by Expulsion status:
+
+JIExpel <- glm(
+  JIncarceration ~ Expel,
+  data = Waves,
+  family = binomial(link = "logit"))
+
+summary(JIExpel)
+exp(coef(JIExpel))
+
+"The odds of being incarcerated as a juvenile are 3.4 times 
+higher if you have ever been expelled than not."
+
+JIAPerform <- glm(
+  JIncarceration ~ AcadPerform,
+  data = Waves,
+  family = binomial(link = "logit"))
+
+summary(JIAPerform)
+exp(coef(JIAPerform))
+
+"The odds of being incarcerated as a juvenile are 1.23 times 
+lower for every 1 unit increase in your overall academic performance"
 

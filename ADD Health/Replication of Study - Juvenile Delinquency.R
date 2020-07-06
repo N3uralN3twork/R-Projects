@@ -59,13 +59,6 @@ table(data1$H1DS4) # Shoplifting
 table(data1$H1DS13) # Stealing less than $50
 table(data1$H1DS9) # Stealing more than $50
 
-"Select only the necessary variables for analyses:"
-data1 <- data1 %>%
-  select(AID, BIO_SEX, S1, H1DS5, H1FV7, H1FV8, 
-         H1FV9, H1DS5, H1DS4, H1DS13, H1DS9,
-         H1WP9, H1WP13, H1WP10, H1WP14, H1ED19,
-         H1ED20, H1ED22, H1ED23)
-
 "Fixing the variables to remove Refused/Don't Know/Not Applicable"
 
 data1 <- data1 %>%
@@ -195,7 +188,7 @@ table(data1$AtSPartOf)
 
 "Attachment to Delinquent Peers (AtDP):"
 
-# Asked of 3 best friends of the respondent
+# Asked to 3 best friends of the respondent
 
 # 0 = Zero friends
 # 3 = All 3 friends
@@ -210,6 +203,175 @@ table(data1$H1TO9)  # Cigarette
 table(data1$H1TO29) # Alcohol
 table(data1$H1TO33) # Marijuana
 
+data1 <- data1 %>%
+  mutate(AtDPCigs = replace(H1TO9, H1TO9 %in% c(6, 8, 9), NA)) %>%
+  mutate(AtDPAlcohol = replace(H1TO29, H1TO29 %in% c(6, 8, 9), NA)) %>%
+  mutate(AtDPWeed = replace(H1TO33, H1TO33 %in% c(6, 8, 9), NA))
+
+# Attachment to Delinquent Peers
+table(data1$AtDPCigs)
+table(data1$AtDPAlcohol)
+table(data1$AtDPWeed)
+
+"Creating the Attachment to Delinquent Peers variable:"
+
+data1 <- data1 %>%
+  mutate(AtDelinqPeers = AtDPCigs + AtDPAlcohol + AtDPWeed)
+
+table(data1$AtDelinqPeers)
+
+
+
+###############################
+###  Academic Performance   ###
+###############################
+
+"Academic Performance (AP):"
+
+# 1 = D
+# 2 = C
+# 3 = B
+# 4 = A
+
+
+# 1. Grade in English/Language Arts
+# 2. Grade in Mathematics
+# 3. Grade in History/Social Studies
+# 4. Grade in Science
+
+table(data1$H1ED11) # English
+table(data1$H1ED12) # Math
+table(data1$H1ED13) # History
+table(data1$H1ED14) # Science
+
+
+"Fixing the variables to remove Refused/Don't Know/Not Applicable/Other:"
+
+data1 <- data1 %>%
+  mutate(APEnglish = replace(H1ED11, H1ED11 %in% c(5, 6, 96, 97, 98, 99), NA)) %>%
+  mutate(APMath = replace(H1ED12, H1ED12 %in% c(5, 6, 96, 97, 98, 99), NA)) %>%
+  mutate(APHistory = replace(H1ED13, H1ED13 %in% c(5, 6, 96, 97, 98, 99), NA)) %>%
+  mutate(APScience = replace(H1ED14, H1ED14 %in% c(5, 6, 96, 97, 98, 99), NA))
+
+# Academic Performance:
+table(data1$APEnglish)
+table(data1$APMath)
+table(data1$APHistory)
+table(data1$APScience)
+
+"Reversing the grading:"
+
+data1 <- data1 %>%
+  mutate(APEnglish = 5-APEnglish,
+         APMath = 5-APMath,
+         APHistory = 5-APHistory,
+         APScience = 5-APScience)
+
+# Academic Performance:
+table(data1$APEnglish)
+table(data1$APMath)
+table(data1$APHistory)
+table(data1$APScience)
+
+data1 <- data1 %>%
+  mutate(AcadPerform = APEnglish + APMath + APHistory + APScience)
+
+"Select only the necessary variables for analyses:"
+dataset <- data1 %>%
+  select(AID, BIO_SEX, S1, H1DS5, H1FV7, H1FV8, 
+         H1FV9, H1DS5, H1DS4, H1DS13, H1DS9,
+         H1WP9, H1WP13, H1WP10, H1WP14, H1ED19,
+         H1ED20, H1ED22, H1ED23, H1TO33, H1TO9,
+         H1TO29, H1ED11, H1ED12, H1ED13, H1ED14,
+         ADPhysicalFight, ADKnifeGun, ADShootStab,
+         ADWeaponSchool, NADLying, NADShoplift, 
+         NADStealLess, NADStealMore, AtPCloseMother,
+         AtPCloseFather, AtPMotherCare, AtPFatherCare,
+         AtSClose, AtSHappy, AtSPartOf, AtSFairly,
+         AtDPCigs, AtDPAlcohol, AtDPWeed, APEnglish,
+         APMath, APHistory, APScience, AggDelinq,
+         NonAggDelinq, AttachParents, AtDelinqPeers,
+         AcadPerform)
+
+table(dataset$AggDelinq)
+table(dataset$NonAggDelinq)
+table(dataset$AttachParents)
+table(dataset$AtDelinqPeers)
+
+###########
+### CFA ###
+###########
+
+"Both fa and cfa give very similar results in terms of metrics
+I included both for reference"
+
+"Confirmatory Factor Analysis:"
+
+# Aggressive Delinquency
+AD.model <- 
+  "
+  # Latent Variables
+  AD =~ ADPhysicalFight + ADKnifeGun + ADShootStab + ADWeaponSchool
+  "
+
+fit <- cfa(AD.model, data = dataset, std.lv=TRUE)
+summary(fit, fit.measures=TRUE, standardized=TRUE)
+
+# Non-aggressive Delinquency
+NAD.model <- 
+  "
+  # Latent Variables
+  NAD =~ NADLying + NADShoplift + NADStealLess + NADStealMore
+  "
+
+fit1 <- cfa(NAD.model, data = dataset, std.lv=TRUE)
+summary(fit1, fit.measures=TRUE, standardized=TRUE)
+
+# Attachment to Parents
+AtParent.model <-
+  "
+  # Latent Variables
+  AParent =~ AtPCloseMother + AtPCloseFather + AtPMotherCare + AtPFatherCare
+  "
+
+fit2 <- cfa(AtParent.model, data = dataset, std.lv=TRUE)
+summary(fit1, fit.measures=TRUE, standardized=TRUE)
+
+
+# Attachment to Delinquent Peers
+AtDPeers.model <-
+  "
+  # Latent variables
+  ADPeers =~ AtDPCigs + AtDPAlcohol + AtDPWeed
+  "
+
+fit3 <- cfa(AtDPeers.model, data = dataset, std.lv=TRUE)
+summary(fit3, fit.measures=TRUE, standardized=TRUE)
+
+# Or
+
+DelinqPeers <- dataset %>%
+  select(AtDPCigs, AtDPAlcohol, AtDPWeed)
+
+solution <- fa(DelinqPeers, nfactors = 1)
+solution
+
+# Academic Performance
+AP.model <- 
+  "
+  APerform =~ APEnglish + APMath + APHistory + APScience
+  "
+
+fit4 <- cfa(AP.model, data = dataset, std.lv=TRUE)
+summary(fit4, fit.measures=TRUE, standardized=TRUE)
+
+# Or 
+
+Academic <- dataset %>%
+  select(APEnglish, APMath, APHistory, APScience)
+
+solution <- fa(Academic, nfactors = 1)
+print(solution)
 
 
 
