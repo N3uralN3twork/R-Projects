@@ -195,9 +195,18 @@ test <-  waves %>%
 table(test$Total)
 
 
+"Creating the Victim Variable:"
 
+# 0 = Was Not a youth or adult victim
+# 1 = Was a youth or adult victim
 
+waves <- waves %>%
+  mutate(Victim = case_when(
+    JVictim == 1 | AVictim == 1 ~ 1,
+    TRUE ~ 0))
 
+table(waves$Victim)
+table(waves$JVictim, waves$AVictim) # Check if TRUE
 
 
 
