@@ -252,6 +252,18 @@ waves <- waves %>%
 table(waves$Gender)
 table(is.na(waves$Gender))
 
+"Gender Recoded:"
+# 0 = Male
+# 1 = Female
+
+waves <- waves %>%
+  mutate(Gender.Coded = recode(
+    Gender,
+    "Female" = 1,
+    "Male" = 0))
+
+table(waves$Gender.Coded)
+
 "Hispanic:"
 # 0 = No
 # 1 = Yes
@@ -1037,10 +1049,10 @@ table(waves$JH2FV1)
 waves <- waves %>%
   mutate(JVictim = case_when(
     JH1FV3 == 1 | JH1FV4 == 1 |
-      JH2FV3 == 1 | JH2FV4 == 1 |
-      JH1FV6 == 1 | JH2FV5 == 1 |
-      JH1FV2 == 1 | JH2FV2 == 1 |
-      JH1FV1 == 1 | JH2FV1 == 1 ~ 1,
+    JH2FV3 == 1 | JH2FV4 == 1 |
+    JH1FV6 == 1 | JH2FV5 == 1 |
+    JH1FV2 == 1 | JH2FV2 == 1 |
+    JH1FV1 == 1 | JH2FV1 == 1 ~ 1,
     TRUE ~ 0))
 
 table(waves$JVictim)
@@ -1145,8 +1157,8 @@ Waves <- waves %>%
          H1WP9, H1WP13, H1WP10, H1WP14, H1ED19,
          H1ED20, H1ED22, H1ED23, H1TO33, H1TO9,
          H1TO29, H1ED11, H1ED12, H1ED13, H1ED14,
-         PEducation, Race, Age, Geography, Gender, Hispanic, Citizenship, EverSuspend, 
-         Divorce, JIncarceration, AIncarceration, FirstIncarcAge, TwoParentHome,
+         PEducation, Race, Age, Geography, Gender, Gender.Coded, Hispanic, Citizenship,
+         EverSuspend, Divorce, JIncarceration, AIncarceration, FirstIncarcAge, TwoParentHome,
          P1Education, P2Education, SES, JIncarceMonths, AIncarceMonths, AEmployed,
          MotherEmployed, FatherEmployed, Unemployment, MotherHoursWeek, FatherHoursWeek,
          MotherOvertime, FatherOvertime, W1Grade, W1GradeLevel, W2Grade, W2GradeLevel,
@@ -1188,7 +1200,7 @@ Waves %>%
             IQR = IQR(Age, na.rm = TRUE))
 
 # Age of First Incarceration
-
+# Lots of NAs since they haven't been arrested yet
 summary(Waves$FirstIncarcAge)
 sd(FirstIncarcAge, na.rm = TRUE)
 
@@ -1461,6 +1473,24 @@ round(prop.table(table(Expel))*100, 1)
 table(Gender, Expel)
 round(prop.table(table(Gender, Expel), margin = 1)*100, 1)
 
+# Were you a victim of crime in your Youth?
+table(JVictim)
+round(prop.table(table(JVictim))*100, 1)
+table(Gender, JVictim)
+round(prop.table(table(Gender, JVictim), margin = 1)*100, 1)
+
+# Were you a victim of crime as an Adult?
+table(AVictim)
+round(prop.table(table(AVictim))*100, 1)
+table(Gender, AVictim)
+round(prop.table(table(Gender, AVictim), margin = 1)*100, 1)
+
+# Were you a victim of crime?
+table(Victim)
+round(prop.table(table(Victim))*100, 1)
+table(Gender, Victim)
+round(prop.table(table(Gender, Victim), margin = 1)*100, 1)
+
 # Juvenile Incarceration
 table(JIncarceration)
 round(prop.table(table(JIncarceration))*100, 1)
@@ -1718,3 +1748,35 @@ exp(coef(JIAPerform))
 "The odds of being incarcerated as a juvenile are 1.23 times 
 lower for every 1 unit increase in your overall academic performance"
 
+# AIncarceration by Victim of Crime status:
+AIVictim <- glm(
+  AIncarceration ~ Victim, 
+  data = Waves,
+  family = binomial(link = "logit"))
+
+summary(AIVictim)
+exp(coef(AIVictim))
+
+"The odds of being incarcerated as an adult are 4.3 times higher
+if you were a victim of crime."
+
+# Gender Only
+MODEL <- 
+  "
+  # Regressions
+  AIncarceration ~ Gender.Coded
+  "
+
+fit <- cfa(MODEL, data = Waves, std.lv=TRUE)
+summary(fit, fit.measures=TRUE, standardized=TRUE)
+
+gender <- glm(
+  AIncarceration ~ Gender,
+  data = Waves,
+  family = binomial(link = "logit"))
+
+summary(gender)
+exp(coef(gender))
+
+"The odds of being incarcerated as an adult are 4.9 times
+higher if you are male than female."
