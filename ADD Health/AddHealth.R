@@ -1107,6 +1107,21 @@ waves <- waves %>%
 table(waves$Victim)
 table(waves$JVictim, waves$AVictim) # Check if TRUE
 
+"Poverty: "
+
+# 0 = no childhood poverty
+# 1 = childhood poverty
+
+table(waves$PA56)
+
+waves <- waves %>%
+  mutate(Poverty = case_when(
+    PA56 %in% c(NA, 6) ~ NaN,
+    PA56 == 0 ~ 1,
+    PA56 == 1 ~ 0))
+
+table(waves$Poverty)
+
 "Juvenile Incarceration:"
 
 # 0 = No
@@ -1171,7 +1186,7 @@ Waves <- waves %>%
          AtDPCigs, AtDPAlcohol, AtDPWeed, APEnglish,
          APMath, APHistory, APScience, AggDelinq,
          NonAggDelinq, AttachParents, AtDelinqPeers, AcadPerform,
-         JVictim, AVictim, Victim)
+         JVictim, AVictim, Victim, Poverty)
 attach(Waves)
 
 "Rename some of the variables:"
@@ -1491,6 +1506,12 @@ round(prop.table(table(Victim))*100, 1)
 table(Gender, Victim)
 round(prop.table(table(Gender, Victim), margin = 1)*100, 1)
 
+# Was your family impoverished?
+table(Poverty)
+round(prop.table(table(Poverty))*100, 1)
+table(Gender, Poverty)
+round(prop.table(table(Gender, Poverty), margin = 1)*100, 1)
+
 # Juvenile Incarceration
 table(JIncarceration)
 round(prop.table(table(JIncarceration))*100, 1)
@@ -1523,6 +1544,14 @@ AD.model <-
 fit <- cfa(AD.model, data = Waves, std.lv=TRUE)
 summary(fit, fit.measures=TRUE, standardized=TRUE)
 
+# or
+
+AggDelinq <- Waves %>%
+  select(ADPhysicalFight, ADKnifeGun, ADShootStab, ADWeaponSchool)
+
+solution <- fa(AggDelinq, nfactors = 1)
+solution
+
 # Non-aggressive Delinquency
 NAD.model <- 
   "
@@ -1532,6 +1561,10 @@ NAD.model <-
 
 fit1 <- cfa(NAD.model, data = Waves, std.lv=TRUE)
 summary(fit1, fit.measures=TRUE, standardized=TRUE)
+
+asdf <- Waves %>%
+  select(NADLying)
+
 
 # Attachment to Parents
 AtParent.model <-
@@ -1605,6 +1638,7 @@ AIage <- glm(
   family = binomial(link = "logit"))
 
 summary(AIage)
+exp(coef(AIage))
 nagelkerke(AIage)
 
 # Juvenile Incarceration via Age
@@ -1620,7 +1654,7 @@ exp(coef(JIAge))
 # Adult Incarceration via Juvenile Incarceration
 
 AIJI <- glm(
-  AIncarceration ~ JIncarceration + Age + Gender + Race,
+  AIncarceration ~ JIncarceration + Age + Gender + Race + ESuspend + MSuspend + HSuspend,
   data = Waves,
   family = binomial(link = "logit"))
 
