@@ -113,7 +113,7 @@ summary(waves$AIncarceMonths)
 waves <- waves %>%
   mutate(Race = case_when(
     H1GI4 == 1 ~ "Hispanic",
-    S6B == 1 ~ "Black",
+    H1GI6B == 1 ~ "Black",
     H1GI6D == 1 ~ "Asian",
     H1GI6C == 1 ~ "Other",
     H1GI6E == 1 ~ "Other",
@@ -123,8 +123,15 @@ waves$Race <- as.factor(waves$Race)
 waves <- within(waves, Race <- relevel(Race, ref="White")) # Set "White" as the reference group
 table(waves$Race)
 table(is.na(waves$Race))
-table(PA12)
-table(is.na(PA12))
+
+"Black:"
+
+waves <- waves %>%
+  mutate(Black = case_when(
+    Race == "Black" ~ 1,
+    TRUE ~ 0))
+
+table(waves$Black)
 
 "Parent's Highest Education:"
 
@@ -1122,6 +1129,127 @@ waves <- waves %>%
 
 table(waves$Poverty)
 
+###################
+### TRAUMA Vars ###
+###################
+
+"Neglect:"
+table(waves$H3MA2) # basic needs
+table(waves$H3MA1) # left home alone
+
+# Basic Needs
+waves <- waves %>%
+  mutate(BasicNeeds = case_when(
+    H3MA2 %in% c(NA, 96, 98, 99) ~ NaN,
+    H3MA2 %in% c(1, 2, 3, 4, 5) ~ 1,
+    TRUE ~ 0))
+
+table(waves$BasicNeeds)
+
+# Left Home Alone
+waves <- waves %>%
+  mutate(HomeAlone = case_when(
+    H3MA1 %in% c(NA, 96, 98, 99) ~ NaN,
+    H3MA1 %in% c(1, 2, 3, 4, 5) ~ 1,
+    H3MA1 == 6 ~ 0))
+
+table(waves$HomeAlone)
+
+
+"Physical Abuse:"
+table(waves$H3MA3) # slapped/hit/kicked
+
+waves <- waves %>%
+  mutate(SlapHitKick = case_when(
+    H3MA3 %in% c(NA, 96, 98, 99) ~ NaN,
+    H3MA3 %in% c(1, 2, 3, 4, 5) ~ 1,
+    H3MA3 == 6 ~ 0))
+
+table(waves$SlapHitKick)
+
+
+"Sexual Abuse:"
+table(waves$H3MA4) # touched in sexual way
+
+waves <- waves %>%
+  mutate(Touched = case_when(
+    H3MA4 %in% c(NA, 96, 98, 99, 0) ~ NaN,
+    H3MA4 %in% c(1, 2, 3, 4, 5) ~ 1,
+    H3MA4 == 6 ~ 0))
+
+table(waves$Touched)
+
+
+"Emotional Abuse:"
+table(waves$H4MA1) # hurt your feelings/feel unloved
+
+waves <- waves %>%
+  mutate(HurtFeelings = case_when(
+    H4MA1 %in% c(NA, 96, 98) ~ NaN,
+    H4MA1 %in% c(1, 2, 3, 4, 5) ~ 1,
+    H4MA1 == 6 ~ 0))
+
+table(waves$HurtFeelings)
+
+
+"Parental Incarceration:"
+table(waves$H4WP9) # Bio Father jail
+table(waves$H4WP3) # Bio Mother jail
+table(waves$H4WP30) # Father Figure jail
+table(waves$H4WP16) # Mother Figure jail
+
+# Bio Father Jail
+waves <- waves %>%
+  mutate(BioFatherJail = replace(H4WP9, H4WP9 %in% c(6, 8), NA))
+
+table(waves$BioFatherJail)
+
+# Bio Mother Jail
+waves <- waves %>%
+  mutate(BioMotherJail = replace(H4WP3, H4WP3 %in% c(6, 8), NA))
+
+table(waves$BioMotherJail)
+
+# Father Figure Jail
+waves <- waves %>%
+  mutate(FigFatherJail = replace(H4WP30, H4WP30 %in% c(6, 7, 8), NA))
+
+table(waves$FigFatherJail)
+
+# Mother Figure Jail
+waves <- waves %>%
+  mutate(FigMotherJail = replace(H4WP16, H4WP16 %in% c(7, 8), NA))
+
+table(waves$FigMotherJail)
+
+"Parent Binge Drinker:"
+
+# More 5 drinks on one occasion
+table(waves$PA62)
+
+waves <- waves %>%
+  mutate(BingeDrink = case_when(
+    PA62 %in% c(NA, 96) ~ NaN,
+    PA62 %in% c(2, 3, 4, 5, 6) ~ 1,
+    PA62 == 1 ~ 0))
+
+table(waves$BingeDrink)
+
+"Creating the Trauma variable:"
+
+# 0 = no traumas experienced
+# 1 = at least 1 trauma experienced
+
+waves <- waves %>%
+  mutate(Trauma = case_when(
+    JVictim == 1 | BasicNeeds == 1 | HomeAlone == 1 |
+      SlapHitKick == 1 | Touched == 1 | HurtFeelings == 1 |
+      BioFatherJail == 1 | BioMotherJail == 1 | FigFatherJail == 1 |
+      FigMotherJail == 1 ~ 1,
+    TRUE ~ 0))
+
+table(waves$Trauma)
+
 "Juvenile Incarceration:"
 
 # 0 = No
@@ -1172,7 +1300,8 @@ Waves <- waves %>%
          H1WP9, H1WP13, H1WP10, H1WP14, H1ED19,
          H1ED20, H1ED22, H1ED23, H1TO33, H1TO9,
          H1TO29, H1ED11, H1ED12, H1ED13, H1ED14,
-         PEducation, Race, Age, Geography, Gender, Gender.Coded, Hispanic, Citizenship,
+         H3MA1, H3MA2, H3MA3, H3MA4, H4MA1, H4WP3, H4WP9, H4WP16, H4WP30,
+         PEducation, Race, Black, Age, Geography, Gender, Gender.Coded, Hispanic, Citizenship,
          EverSuspend, Divorce, JIncarceration, AIncarceration, FirstIncarcAge, TwoParentHome,
          P1Education, P2Education, SES, JIncarceMonths, AIncarceMonths, AEmployed,
          MotherEmployed, FatherEmployed, Unemployment, MotherHoursWeek, FatherHoursWeek,
@@ -1186,15 +1315,16 @@ Waves <- waves %>%
          AtDPCigs, AtDPAlcohol, AtDPWeed, APEnglish,
          APMath, APHistory, APScience, AggDelinq,
          NonAggDelinq, AttachParents, AtDelinqPeers, AcadPerform,
-         JVictim, AVictim, Victim, Poverty)
-attach(Waves)
+         JVictim, AVictim, Victim, Poverty, BasicNeeds, HomeAlone, SlapHitKick,
+         Touched, HurtFeelings, BioFatherJail, BioMotherJail, FigFatherJail, FigMotherJail,
+         BingeDrink, Trauma)
 
 "Rename some of the variables:"
 #New = Old
 
 Waves <- Waves %>%
-          rename(Black = S6B,
-                 BirthYear = H1GI1Y)
+          rename(BirthYear = H1GI1Y)
+attach(Waves)
 
 names(Waves)
 
@@ -1316,6 +1446,13 @@ Waves %>%
 
 "Categorical Variables:" 
 
+crossTab <- function(X){
+  print(table(X))
+  print(round(prop.table(table(X))*100, 1))
+  print(table(Gender, X))
+  print(round(prop.table(table(Gender, X), margin = 1)*100, 1))
+}
+
 # Gender
 table(Gender)
 round(prop.table(table(Gender))*100,1)
@@ -1327,190 +1464,127 @@ table(Gender, Race)
 round(prop.table(table(Gender, Race), margin = 1)*100, 1)
 
 # Hispanic
-table(Hispanic)
-round(prop.table(table(Hispanic))*100, 1)
-table(Gender, Hispanic)
-round(prop.table(table(Gender, Hispanic), margin = 1)*100, 1)
+crossTab(Hispanic)
 
 # Citizenship
-table(Citizenship)
-round(prop.table(table(Citizenship))*100, 1)
-table(Gender, Citizenship)
-round(prop.table(table(Gender, Citizenship), margin = 1)*100, 1)
+crossTab(Citizenship)
 
 # Black
-table(Black)
-round(prop.table(table(Black))*100, 1)
-table(Gender, Black)
-round(prop.table(table(Gender, Black), margin = 1)*100, 1)
+crossTab(Black)
 
 # Parent's Education
-table(PEducation)
-round(prop.table(table(PEducation))*100, 1)
-table(Gender, PEducation)
-round(prop.table(table(Gender, PEducation), margin = 1)*100, 1)
+crossTab(PEducation)
 
 # SES
-table(SES)
-round(prop.table(table(SES))*100, 1)
-table(Gender, SES)
-round(prop.table(table(Gender, SES), margin = 1)*100, 1)
+crossTab(SES)
 
 # Divorce
-table(Divorce)
-round(prop.table(table(Divorce))*100, 1)
-table(Gender, Divorce)
-round(prop.table(table(Gender, Divorce), margin = 1)*100, 1)
+crossTab(Divorce)
 
 # Two Parent Home
-table(TwoParentHome)
-round(prop.table(table(TwoParentHome))*100, 1)
-table(Gender, TwoParentHome)
-round(prop.table(table(Gender, TwoParentHome), margin = 1)*100, 1)
+crossTab(TwoParentHome)
 
 # Geography
-table(Geography)
-round(prop.table(table(Geography))*100, 1)
-table(Gender, Geography)
-round(prop.table(table(Gender, Geography), margin = 1)*100, 1)
+crossTab(Geography)
 
 # Employed as an Adult
-table(AEmployed)
-round(prop.table(table(AEmployed))*100, 1)
-table(Gender, AEmployed)
-round(prop.table(table(Gender, AEmployed), margin = 1)*100, 1)
+crossTab(AEmployed)
 
 # Mother has a Job
-table(MotherEmployed)
-round(prop.table(table(MotherEmployed))*100, 1)
-table(Gender, MotherEmployed)
-round(prop.table(table(Gender, MotherEmployed), margin = 1)*100, 1)
+crossTab(MotherEmployed)
 
 # Father has a Job
-table(FatherEmployed)
-round(prop.table(table(FatherEmployed))*100, 1)
-table(Gender, FatherEmployed)
-round(prop.table(table(Gender, FatherEmployed), margin = 1)*100, 1)
+crossTab(FatherEmployed)
 
 # Father Overtime
-table(FatherOvertime)
-round(prop.table(table(FatherOvertime))*100, 1)
-table(Gender, FatherOvertime)
-round(prop.table(table(Gender, FatherOvertime), margin = 1)*100, 1)
+crossTab(FatherOvertime)
 
 # Mother Overtime
-table(MotherOvertime)
-round(prop.table(table(MotherOvertime))*100, 1)
-table(Gender, MotherOvertime)
-round(prop.table(table(Gender, MotherOvertime), margin = 1)*100, 1)
+crossTab(MotherOvertime)
 
 # Unemployment
-table(Unemployment)
-round(prop.table(table(Unemployment))*100, 1)
-table(Gender, Unemployment)
-round(prop.table(table(Gender, Unemployment), margin = 1)*100, 1)
+crossTab(Unemployment)
 
 # Grade @ Wave 1
-table(W1Grade)
-round(prop.table(table(W1Grade))*100, 1)
-table(Gender, W1Grade)
-round(prop.table(table(Gender, W1Grade), margin = 1)*100, 1)
+crossTab(W1Grade)
 
 # Middle School or High School @ Wave 1
-table(W1GradeLevel)
-round(prop.table(table(W1GradeLevel))*100, 1)
-table(Gender, W1GradeLevel)
-round(prop.table(table(Gender, W1GradeLevel), margin = 1)*100, 1)
+crossTab(W1GradeLevel)
 
 # Grade @ Wave 2
-table(W2Grade)
-round(prop.table(table(W2Grade))*100, 1)
-table(Gender, W2Grade)
-round(prop.table(table(Gender, W2Grade), margin = 1)*100, 1)
+crossTab(W2Grade)
 
 # Middle School or High School @ Wave 2
-table(W2GradeLevel)
-round(prop.table(table(W2GradeLevel))*100, 1)
-table(Gender, W2GradeLevel)
-round(prop.table(table(Gender, W2GradeLevel), margin = 1)*100, 1)
+crossTab(W2GradeLevel)
 
 # Did they dropout of middle school?
-table(MiddleDropout)
-round(prop.table(table(MiddleDropout))*100, 1)
-table(Gender, MiddleDropout)
-round(prop.table(table(Gender, MiddleDropout), margin = 1)*100, 1)
+crossTab(MiddleDropout)
 
 # Did they dropout of high school?
-table(HighDropout)
-round(prop.table(table(HighDropout))*100, 1)
-table(Gender, HighDropout)
-round(prop.table(table(Gender, HighDropout), margin = 1)*100, 1)
+crossTab(HighDropout)
 
 # Family Size
-table(FamilySize)
-round(prop.table(table(FamilySize))*100, 1)
-table(Gender, FamilySize)
-round(prop.table(table(Gender, FamilySize), margin = 1)*100, 1)
+crossTab(FamilySize)
 
 # Has either parent died?
-table(Death)
-round(prop.table(table(Death))*100, 1)
-table(Gender, Death)
-round(prop.table(table(Gender, Death), margin = 1)*100, 1)
+crossTab(Death)
 
 # Have you ever been suspended?
-table(EverSuspend)
-round(prop.table(table(EverSuspend))*100, 1)
-table(Gender, EverSuspend)
-round(prop.table(table(Gender, EverSuspend), margin = 1)*100, 1)
+crossTab(EverSuspend)
 
 # Were you suspended in elementary school?
-table(ESuspend)
-round(prop.table(table(ESuspend))*100, 1)
-table(Gender, ESuspend)
-round(prop.table(table(Gender, ESuspend), margin = 1)*100, 1)
+crossTab(ESuspend)
 
 # Were you suspended in middle school?
-table(MSuspend)
-round(prop.table(table(MSuspend))*100, 1)
-table(Gender, MSuspend)
-round(prop.table(table(Gender, MSuspend), margin = 1)*100, 1)
+crossTab(MSuspend)
 
 # Were you suspended in high school?
-table(HSuspend)
-round(prop.table(table(HSuspend))*100, 1)
-table(Gender, HSuspend)
-round(prop.table(table(Gender, HSuspend), margin = 1)*100, 1)
+crossTab(HSuspend)
 
 # Have you ever been expelled from school?
-table(Expel)
-round(prop.table(table(Expel))*100, 1)
-table(Gender, Expel)
-round(prop.table(table(Gender, Expel), margin = 1)*100, 1)
+crossTab(Expel)
 
 # Were you a victim of crime in your Youth?
-table(JVictim)
-round(prop.table(table(JVictim))*100, 1)
-table(Gender, JVictim)
-round(prop.table(table(Gender, JVictim), margin = 1)*100, 1)
+crossTab(JVictim)
 
 # Were you a victim of crime as an Adult?
-table(AVictim)
-round(prop.table(table(AVictim))*100, 1)
-table(Gender, AVictim)
-round(prop.table(table(Gender, AVictim), margin = 1)*100, 1)
+crossTab(AVictim)
 
 # Were you a victim of crime?
-table(Victim)
-round(prop.table(table(Victim))*100, 1)
-table(Gender, Victim)
-round(prop.table(table(Gender, Victim), margin = 1)*100, 1)
+crossTab(Victim)
 
 # Was your family impoverished?
-table(Poverty)
-round(prop.table(table(Poverty))*100, 1)
-table(Gender, Poverty)
-round(prop.table(table(Gender, Poverty), margin = 1)*100, 1)
+crossTab(Poverty)
+
+# Have your parents taken care of your basic needs?
+crossTab(BasicNeeds)
+
+# Were you left home alone when you should not have been?
+crossTab(HomeAlone)
+
+# Did your parents ever slap/hit/kick you?
+crossTab(SlapHitKick)
+
+# Did your parents ever touch you in a sexual way?
+crossTab(Touched)
+
+# Did your parents ever hurt your feelings / feel unloved?
+crossTab(HurtFeelings)
+
+# Has your biological father ever been in jail?
+crossTab(BioFatherJail)
+
+# Has your biological mother ever been in jail?
+crossTab(BioMotherJail)
+
+# Has your father figure ever been in jail?
+crossTab(FigFatherJail)
+
+# Has your mother figure ever been in jail?
+crossTab(FigMotherJail)
+
+# Was your parent a binge drinker?
+crossTab(BingeDrink)
 
 # Juvenile Incarceration
 table(JIncarceration)
@@ -1814,3 +1888,22 @@ exp(coef(gender))
 
 "The odds of being incarcerated as an adult are 4.9 times
 higher if you are male than female."
+
+# Being Black
+
+AIBlack <- glm(
+  AIncarceration ~ Black,
+  data = Waves,
+  family = binomial(link = "logit"))
+
+summary(AIBlack)
+exp(coef(AIBlack))
+
+
+
+
+
+
+
+
+

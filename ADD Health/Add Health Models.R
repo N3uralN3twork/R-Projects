@@ -4,7 +4,7 @@ names(Waves)
 MODEL <- 
   "
   # Latent Variables
-  
+
   SCHOOL =~ APMath + APScience + APHistory + APEnglish
   
   #SCHOOLATTACH =~ AtSClose + AtSHappy + AtSPartOf + AtSFairly
@@ -19,38 +19,63 @@ MODEL <-
   
   #TRAUMAFAMILY =~ Death + Divorce
   
-  #TRAUMAPOVERTY =~ Unemployment
+  TRAUMAPOVERTY =~ Unemployment + Poverty
   
-  TRAUMACRIME =~ Victim
+  TRAUMACRIME =~ Victim  + Touched
+  
+  TRAUMAOTHER =~ BasicNeeds + HomeAlone + HurtFeelings
   
   # Regressions
   
-  AIncarceration ~ SCHOOL + AGGDELINQ + NADDELINQ + TRAUMACRIME + 
+  AIncarceration ~ SCHOOL + AGGDELINQ + NADDELINQ + TRAUMACRIME  +
                    ESuspend + MSuspend + HSuspend + Gender.Coded + Black + Citizenship + FamilySize + HighGrade15 + SES + Unemployment + JIncarceration
 
-  JIncarceration ~ SCHOOL + AGGDELINQ + NADDELINQ + TRAUMACRIME + 
+  JIncarceration ~ SCHOOL + AGGDELINQ + NADDELINQ + TRAUMACRIME  +
                    ESuspend + MSuspend + HSuspend + Gender.Coded + Black + Citizenship + FamilySize + HighGrade15 + SES + Unemployment
   "
 
 fit <- cfa(MODEL, data = Waves, std.lv=TRUE)
 summary(fit, fit.measures=TRUE, standardized=TRUE)
-lavInspect(fit)
 exp(coef(fit))
 
-table(Waves$AtDPCigs)
-table(Waves$AtDPAlcohol)
-table(Waves$AtDPWeed)
 
+# Cronbach's Alpha
 NAD <- Waves %>%
   select(NADLying, NADShoplift, NADStealLess, NADStealMore)
-
-alpha(AggDelinq)
 alpha(NAD)
 
-princomp(AggDelinq, cor=TRUE)
 
-# Compute Z-scores for NAD:
-waves <- waves %>%
-  mutate(ZScoreLying = (NADLying - mean(NADLying, na.rm = TRUE))/sd(NADLying, na.rm = TRUE)) %>%
-  mutate(ZScore)
-summary(waves$ZScore)
+
+
+
+
+
+##################################
+### Logistic Regression Models ###
+##################################
+
+"Being Black:"
+
+AIBlack <- glm(
+  AIncarceration ~ Black,
+  data = Waves,
+  family = binomial(link = "logit"))
+
+summary(AIBlack)
+exp(coef(AIBlack))
+"The odds of being incarcerated as an adult are 1.44 times
+higher if you are black than if you are not."
+
+
+"Full Model:"
+
+AIFull <- glm(
+  AIncarceration ~ ESuspend + MSuspend + HSuspend + Gender.Coded + Black + Citizenship + FamilySize + HighGrade15 + SES + Unemployment + JIncarceration,
+  data = Waves,
+  family = binomial(link = "logit"))
+
+summary(AIFull)
+
+
+
+
