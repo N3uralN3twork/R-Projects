@@ -82,10 +82,10 @@ waves <- waves %>%
   mutate(JIncarceMonths = JIncarceMonths + JIncarceMonths2)
 
 
-table(H4CJ24Y)
-table(H4CJ24M)
+table(waves$H4CJ24Y)
+table(waves$H4CJ24M)
 table(waves$JIncarceMonths)
-summary(waves$JIncarceMonths)
+describe(waves$JIncarceMonths)
 
 
 "Months Incarcerated as an Adult:"
@@ -103,8 +103,8 @@ waves <- waves %>%
   mutate(AIncarceMonths = AIncarceMonths + AIncarceMonths2)
 
 
-table(H4CJ25Y)
-table(H4CJ25M)
+table(waves$H4CJ25Y)
+table(waves$H4CJ25M)
 table(waves$AIncarceMonths)
 summary(waves$AIncarceMonths)
 
@@ -132,6 +132,13 @@ waves <- waves %>%
     TRUE ~ 0))
 
 table(waves$Black)
+
+"Asian:"
+
+waves <- waves %>%
+  mutate(Asian = case_when(
+    Race == "Asian" ~ 1,
+    TRUE ~ 0))
 
 "Parent's Highest Education:"
 
@@ -232,6 +239,7 @@ waves <- waves %>%
     PA10 %in% c(4,5) ~ 1))
 
 table(waves$Divorce)
+table(is.na(waves$Divorce))
 
 "Geography:"
 
@@ -248,6 +256,7 @@ waves <- waves %>%
     H1IR12 %in% c(2,3,4,5) ~ 1))
 
 table(waves$Geography)
+table(is.na(waves$Geography))
 
 "Gender:"
 
@@ -325,6 +334,7 @@ waves <- waves %>%
     H3DA28 == 1 ~ 1))
 
 table(waves$AEmployed)
+table(is.na(waves$AEmployed))
 
 "Does your mother have a job?"
 
@@ -496,7 +506,7 @@ table(waves$W2Grade)
 # 6 = 6 or more people
 
 table(waves$S27)
-
+table(is.na(waves$S27))
 waves <- waves %>%
   mutate(FamilySize = replace(S27, S27 %in% c(7, 99), NA))
 table(waves$FamilySize)
@@ -574,6 +584,7 @@ waves <- waves %>%
     TRUE ~ 0))
 
 table(waves$HighDropout)
+table(is.na(waves$HighDropout))
 
 "Have you ever been suspended?"
 
@@ -586,7 +597,7 @@ waves <- waves %>%
   mutate(EverSuspend = replace(H1ED7, H1ED7 %in% c(6, 8), NA))
 
 table(waves$EverSuspend)
-
+table(is.na(waves$EverSuspend))
 "Grade of Last Suspension:"
 
 table(waves$H1ED8)
@@ -1114,20 +1125,20 @@ waves <- waves %>%
 table(waves$Victim)
 table(waves$JVictim, waves$AVictim) # Check if TRUE
 
-"Poverty: "
+"Can't Pay your Bills: "
 
-# 0 = no childhood poverty
-# 1 = childhood poverty
+# 0 = can pay bills
+# 1 = can't pay bills
 
 table(waves$PA56)
 
 waves <- waves %>%
-  mutate(Poverty = case_when(
+  mutate(CantPayBills = case_when(
     PA56 %in% c(NA, 6) ~ NaN,
     PA56 == 0 ~ 1,
     PA56 == 1 ~ 0))
 
-table(waves$Poverty)
+table(waves$CantPayBills)
 
 ###################
 ### TRAUMA Vars ###
@@ -1250,6 +1261,97 @@ waves <- waves %>%
 
 table(waves$Trauma)
 
+"Homeless:"
+# 0 = never been homeless
+# 1 = has been homeless at least once
+# NA = Skip/Don't Know/NA
+
+waves <- waves %>%
+  mutate(Homeless = replace(H3HR24, H3HR24 %in% c(7, 8, 9), NA))
+
+table(waves$Homeless)
+
+"Adult Delinquency:"
+
+# Non-aggressive Adult Delinquency:
+
+table(waves$H4DS2) # Steal More $50
+table(waves$H4DS6) # Steal Less $50
+table(waves$H4DS8) # Steal Property
+table(waves$H4DS1) # Damage others property
+
+# Aggressive Adult Delinquency:
+table(waves$H4DS20) # Shot / Stabbed someone
+table(waves$H4DS11) # Got into a serious physical fight
+table(waves$H4DS19) # You pulled a knife/gun on someone
+table(waves$H4DS5) # Sold drugs
+
+"Fixing the variables to remove Refused/Don't Know/Not Applicable"
+
+"Adult Steal More than $50:"
+waves <- waves %>%
+  mutate(AStealMore = case_when(
+    H4DS2 %in% c(6, 8) ~ NaN,
+    H4DS2 == 0 ~ 0,
+    H4DS2 %in% c(1, 2, 3) ~ 1))
+table(waves$AStealMore)
+
+"Adult Steal Less than $50:"
+waves <- waves %>%
+  mutate(AStealLess = case_when(
+    H4DS6 %in% c(6, 8) ~ NaN,
+    H4DS6 == 0 ~ 0,
+    H4DS6 %in% c(1, 2, 3) ~ 1))
+table(waves$AStealLess)
+
+"Adult Steal Property:"
+waves <- waves %>%
+  mutate(AStealProperty = case_when(
+    H4DS8 %in% c(6, 8) ~ NaN,
+    H4DS8 == 0 ~ 0,
+    H4DS8 %in% c(1, 2, 3) ~ 1))
+table(waves$AStealProperty)
+
+"Adult Damage Other Property:"
+waves <- waves %>%
+  mutate(ADamageProperty = case_when(
+    H4DS1 %in% c(6, 8) ~ NaN,
+    H4DS1 == 0 ~ 0,
+    H4DS1 %in% c(1, 2, 3) ~ 1))
+table(waves$ADamageProperty)
+
+"Adult Shoot/Stab Someone:"
+waves <- waves %>%
+  mutate(AShootStab = replace(H4DS20, H4DS20 %in% c(NA, 6, 8), NA))
+table(waves$AShootStab)
+
+" Adult Serious Physical Fight:"
+waves <- waves %>%
+  mutate(APhysicalFight = case_when(
+    H4DS11 %in% c(6, 8) ~ NaN,
+    H4DS11 == 0 ~ 0,
+    H4DS11 %in% c(1, 2, 3) ~ 1))
+table(waves$APhysicalFight)
+
+"Adult Pulled a Knife/Gun on Someone"
+waves <- waves %>%
+  mutate(AKnifeGun = replace(H4DS19, H4DS19 %in% c(NA, 6, 8), NA))
+table(waves$AKnifeGun)
+
+"Adult Sell Drugs:"
+waves <- waves %>%
+  mutate(ASellDrugs = case_when(
+    H4DS5 %in% c(6, 8) ~ NaN,
+    H4DS5 == 0 ~ 0,
+    H4DS5 %in% c(1, 2, 3) ~ 1))
+table(waves$ASellDrugs)
+
+"Foster Home:"
+
+waves <- waves %>%
+  mutate(FosterHome = replace(H3OD31, H3OD31 %in% c(NA, 6, 8, 9), NA))
+table(waves$FosterHome)
+
 "Juvenile Incarceration:"
 
 # 0 = No
@@ -1262,6 +1364,16 @@ waves <- waves %>%
     H3CJ5 %in% c(96,98,99) ~ NaN,
     H3CJ5 == 97 ~ 0,
     H3CJ5 %in% seq(1,50) ~ 1))
+
+table(waves$JIncarceration)
+table(is.na(waves$JIncarceration))
+
+"Juvenile Incarceration:"
+waves <- waves %>%
+  mutate(JIncarceration = case_when(
+    H4CJ5 %in% c(996, 998) ~ NaN,
+    H4CJ5 == 997 ~ 0,
+    H4CJ5 %in% seq(1, 95) ~ 1))
 
 table(waves$JIncarceration)
 table(is.na(waves$JIncarceration))
@@ -1282,6 +1394,7 @@ waves <- waves %>%
 table(waves$AIncarceration)
 table(is.na(waves$AIncarceration))
 
+
 #########################
 variables <- as.data.frame(names(waves))
 #########################
@@ -1294,14 +1407,14 @@ Waves <- waves %>%
          H2GI10, H2IR12, H2FV1, H2DS10, H2DS11, H3DA31,
          H3DS8, H3OD4B, BIO_SEX3, H3HR24, H3HR25, H3ID32,
          H3ID30, H3ID29, H3CJ5, H3DS16, H3CJ108A, H3LM7,
-         H4DS8, H4CJ9I, H4DS1, H4DS19, H4CJ25M, H4DS5, H4DS6, H4DS2,
+         H4DS8, H4CJ9I, H4DS1, H4DS2, H4DS5, H4DS6, H4DS19, H4CJ25M, H4DS5, H4DS6, H4DS2,
          H4WP28, H4CJ20, H4ED2, H4CJ1, H4CJ6, H4CJ17, H4CJ24M, H4LM11, H1FV7, H1FV8, 
          H1FV9, H1DS5, H1DS4, H1DS13, H1DS9,
          H1WP9, H1WP13, H1WP10, H1WP14, H1ED19,
          H1ED20, H1ED22, H1ED23, H1TO33, H1TO9,
          H1TO29, H1ED11, H1ED12, H1ED13, H1ED14,
          H3MA1, H3MA2, H3MA3, H3MA4, H4MA1, H4WP3, H4WP9, H4WP16, H4WP30,
-         PEducation, Race, Black, Age, Geography, Gender, Gender.Coded, Hispanic, Citizenship,
+         PEducation, Race, Black, Asian, Age, Geography, Gender, Gender.Coded, Hispanic, Citizenship,
          EverSuspend, Divorce, JIncarceration, AIncarceration, FirstIncarcAge, TwoParentHome,
          P1Education, P2Education, SES, JIncarceMonths, AIncarceMonths, AEmployed,
          MotherEmployed, FatherEmployed, Unemployment, MotherHoursWeek, FatherHoursWeek,
@@ -1315,9 +1428,10 @@ Waves <- waves %>%
          AtDPCigs, AtDPAlcohol, AtDPWeed, APEnglish,
          APMath, APHistory, APScience, AggDelinq,
          NonAggDelinq, AttachParents, AtDelinqPeers, AcadPerform,
-         JVictim, AVictim, Victim, Poverty, BasicNeeds, HomeAlone, SlapHitKick,
+         JVictim, AVictim, Victim, CantPayBills, BasicNeeds, HomeAlone, SlapHitKick,
          Touched, HurtFeelings, BioFatherJail, BioMotherJail, FigFatherJail, FigMotherJail,
-         BingeDrink, Trauma)
+         BingeDrink, Trauma, Homeless, AStealMore, AStealLess, AStealProperty, ADamageProperty,
+         AShootStab, APhysicalFight, AKnifeGun, ASellDrugs, FosterHome)
 
 "Rename some of the variables:"
 #New = Old
@@ -1472,6 +1586,9 @@ crossTab(Citizenship)
 # Black
 crossTab(Black)
 
+# Asian
+crossTab(Asian)
+
 # Parent's Education
 crossTab(PEducation)
 
@@ -1554,7 +1671,7 @@ crossTab(AVictim)
 crossTab(Victim)
 
 # Was your family impoverished?
-crossTab(Poverty)
+crossTab(CantPayBills)
 
 # Have your parents taken care of your basic needs?
 crossTab(BasicNeeds)
@@ -1585,6 +1702,33 @@ crossTab(FigMotherJail)
 
 # Was your parent a binge drinker?
 crossTab(BingeDrink)
+
+# Have you ever been homeless for a week or longer?
+crossTab(Homeless)
+
+# Have you stolen more than $50 as an adult in past 12 months?
+crossTab(AStealMore)
+
+# Have you stolen less than $50 as an adult in the past 12 months?
+crossTab(AStealLess)
+
+# Have you stolen other people's property as an adult in the past 12 months?
+crossTab(AStealProperty)
+
+# Have you damaged other people's property as an adult in the past 12 months?
+crossTab(ADamageProperty)
+
+# Have you shot/stabbed someone as an adult in the past 12 months?
+crossTab(AShootStab)
+
+# Have you gotten into a physical fight as an adult in the past 12 months?
+crossTab(APhysicalFight)
+
+# Have you pulled a knife/gun on someone as an adult in the past 12 months?
+crossTab(AKnifeGun)
+
+# Have you sold drugs as an adult in the past 12 months?
+crossTab(ASellDrugs)
 
 # Juvenile Incarceration
 table(JIncarceration)

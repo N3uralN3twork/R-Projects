@@ -1,9 +1,55 @@
 library(lavaan)
 names(Waves)
 
+# Rename Poverty to Can't pay bills
+# Find Bullying
+# Code Asian/Other
+# Adult Crime = Aggressive and Non-aggressive Crimes
+
+
 MODEL <- 
   "
-  # Latent Variables
+  ### Latent Variables ###
+  
+  AGGDELINQ =~ ADPhysicalFight + ADKnifeGun + ADShootStab + ADWeaponSchool
+  
+  NONAGGDELINQ =~ NADLying + NADShoplift + NADStealLess + NADStealMore
+  
+  #TRAUMAFAMILY =~ Divorce
+  
+  TRAUMAPOVERTY =~ CantPayBills + Homeless
+  
+  #TRAUMACRIME =~ Victim + BioFatherJail + BioMotherJail + FigFatherJail + FigMotherJail
+  
+  TRAUMAMALTREATMENT =~ Touched + SlapHitKick + BasicNeeds
+  
+  ### Correlations ###
+  
+  AGGDELINQ ~~ NONAGGDELINQ
+  
+  TRAUMAPOVERTY ~~ TRAUMAMALTREATMENT
+  
+  ### Regressions ###
+  
+  AIncarceration ~ AGGDELINQ + NONAGGDELINQ + TRAUMAMALTREATMENT + TRAUMAPOVERTY + Victim + Divorce +
+                   Gender.Coded + Black + Hispanic + Asian + Citizenship + Age + SES + TwoParentHome + HighestGrade + JIncarceration
+
+  JIncarceration ~ AGGDELINQ + NONAGGDELINQ + TRAUMAMALTREATMENT + TRAUMAPOVERTY + Victim + Divorce +
+                   Gender.Coded + Black + Hispanic + Asian + Citizenship + Age + SES + TwoParentHome + HighestGrade
+                   
+  AGGDELINQ ~ Gender.Coded + Black + Hispanic + Asian + Citizenship + Age + SES + TwoParentHome + HighestGrade
+  
+  NONAGGDELINQ ~ Gender.Coded + Black + Hispanic + Asian + Citizenship + Age + SES + TwoParentHome + HighestGrade
+  "
+
+fit <- cfa(MODEL, data=Waves, std.lv=TRUE)
+summary(fit, fit.measures=TRUE, standardized=TRUE)
+exp(coef(fit))
+
+
+GENDER <- 
+  "
+  ### Latent Variables ###
 
   SCHOOL =~ APMath + APScience + APHistory + APEnglish
   
@@ -11,7 +57,7 @@ MODEL <-
   
   #PARENTATTACH =~ AtPCloseMother + AtPCloseFather + AtPMotherCare + AtPFatherCare
   
-  #DELINQPEERS =~ AtDPCigs + AtDPAlcohol + AtDPWeed
+  DELINQPEERS =~ AtDPCigs + AtDPAlcohol + AtDPWeed
   
   AGGDELINQ =~ ADPhysicalFight + ADKnifeGun + ADShootStab + ADWeaponSchool
   
@@ -19,35 +65,32 @@ MODEL <-
   
   #TRAUMAFAMILY =~ Death + Divorce
   
-  TRAUMAPOVERTY =~ Unemployment + Poverty
+  TRAUMAPOVERTY =~ Unemployment + Poverty + Homeless
   
   TRAUMACRIME =~ Victim  + Touched
   
   TRAUMAOTHER =~ BasicNeeds + HomeAlone + HurtFeelings
   
-  # Regressions
+  ### Regressions ###
   
   AIncarceration ~ SCHOOL + AGGDELINQ + NADDELINQ + TRAUMACRIME  +
-                   ESuspend + MSuspend + HSuspend + Gender.Coded + Black + Citizenship + FamilySize + HighGrade15 + SES + Unemployment + JIncarceration
+                   ESuspend + MSuspend + HSuspend  + Black + Citizenship + FamilySize + HighGrade15 + SES + Unemployment + JIncarceration
 
   JIncarceration ~ SCHOOL + AGGDELINQ + NADDELINQ + TRAUMACRIME  +
-                   ESuspend + MSuspend + HSuspend + Gender.Coded + Black + Citizenship + FamilySize + HighGrade15 + SES + Unemployment
+                   ESuspend + MSuspend + HSuspend  + Black + Citizenship + FamilySize + HighGrade15 + SES + Unemployment
   "
 
-fit <- cfa(MODEL, data = Waves, std.lv=TRUE)
-summary(fit, fit.measures=TRUE, standardized=TRUE)
-exp(coef(fit))
+fit2 <- cfa(MODEL, data=waves, std.lv=TRUE, group="Gender")
+summary(fit2, fit.measures=TRUE, standardized=TRUE)
+
+
+
 
 
 # Cronbach's Alpha
 NAD <- Waves %>%
   select(NADLying, NADShoplift, NADStealLess, NADStealMore)
 alpha(NAD)
-
-
-
-
-
 
 
 ##################################
@@ -70,12 +113,8 @@ higher if you are black than if you are not."
 "Full Model:"
 
 AIFull <- glm(
-  AIncarceration ~ ESuspend + MSuspend + HSuspend + Gender.Coded + Black + Citizenship + FamilySize + HighGrade15 + SES + Unemployment + JIncarceration,
-  data = Waves,
+  AIncarceration ~  as.factor(JIncarceration),
+  data = waves,
   family = binomial(link = "logit"))
 
 summary(AIFull)
-
-
-
-
