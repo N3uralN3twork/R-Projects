@@ -43,9 +43,11 @@ table(is.na(wave1$AID))
 
 "Merge waves by AID:"
 
-waves <- merge(wave1, wave2, by="AID")
-waves <- merge(waves, wave3, by="AID")
-waves <- merge(waves, wave4, by="AID")
+# Remove the ALL=TRUE option to only keep obs in all datasets
+
+waves <- merge(wave1, wave2, by="AID", all=TRUE)
+waves <- merge(waves, wave3, by="AID", all=TRUE)
+waves <- merge(waves, wave4, by="AID", all=TRUE)
 
 "Calculating the Age:"
 
@@ -1256,7 +1258,7 @@ waves <- waves %>%
     JVictim == 1 | BasicNeeds == 1 | HomeAlone == 1 |
       SlapHitKick == 1 | Touched == 1 | HurtFeelings == 1 |
       BioFatherJail == 1 | BioMotherJail == 1 | FigFatherJail == 1 |
-      FigMotherJail == 1 ~ 1,
+      FigMotherJail == 1 | BingeDrink ==1 ~ 1,
     TRUE ~ 0))
 
 table(waves$Trauma)
