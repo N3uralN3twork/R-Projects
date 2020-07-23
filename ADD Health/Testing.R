@@ -15,3 +15,8 @@ AAD <-
 fit4 <- cfa(AAD, data=Waves, std.lv=TRUE)
 summary(fit4, fit.measures=TRUE, standardized=TRUE)
 
+
+test <- 
+  "
+  AIncarceration =~ JIncarceration
+  "

@@ -1,11 +1,6 @@
 library(lavaan)
 names(Waves)
 
-# Rename Poverty to Can't pay bills
-# Find Bullying
-# Code Asian/Other
-# Adult Crime = Aggressive and Non-aggressive Crimes
-
 
 MODEL <- 
   "

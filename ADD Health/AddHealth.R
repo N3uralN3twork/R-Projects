@@ -43,7 +43,7 @@ table(is.na(wave1$AID))
 
 "Merge waves by AID:"
 
-# Remove the ALL=TRUE option to only keep obs in all datasets
+# Remove the ALL=TRUE option to only keep obs in all data sets
 
 waves <- merge(wave1, wave2, by="AID", all=TRUE)
 waves <- merge(waves, wave3, by="AID", all=TRUE)
