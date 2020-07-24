@@ -1362,17 +1362,6 @@ table(waves$FosterHome)
 
 waves <- waves %>%
   mutate(JIncarceration = case_when(
-    is.na(H3CJ5) ~ NaN,
-    H3CJ5 %in% c(96,98,99) ~ NaN,
-    H3CJ5 == 97 ~ 0,
-    H3CJ5 %in% seq(1,50) ~ 1))
-
-table(waves$JIncarceration)
-table(is.na(waves$JIncarceration))
-
-"Juvenile Incarceration:"
-waves <- waves %>%
-  mutate(JIncarceration = case_when(
     H4CJ5 %in% c(996, 998) ~ NaN,
     H4CJ5 == 997 ~ 0,
     H4CJ5 %in% seq(1, 95) ~ 1))

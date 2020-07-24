@@ -18,5 +18,8 @@ summary(fit4, fit.measures=TRUE, standardized=TRUE)
 
 test <- 
   "
-  AIncarceration =~ JIncarceration
+  AIncarceration ~ JIncarceration
   "
+fit <- cfa(test, data=Waves, std.lv=TRUE)
+summary(fit, fit.measures=TRUE, standardized=TRUE)
+

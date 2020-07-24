@@ -45,10 +45,6 @@ exp(coef(fit))
 GENDER <- 
   "
   ### Latent Variables ###
-
-  SCHOOL =~ APMath + APScience + APHistory + APEnglish
-  
-  #SCHOOLATTACH =~ AtSClose + AtSHappy + AtSPartOf + AtSFairly
   
   #PARENTATTACH =~ AtPCloseMother + AtPCloseFather + AtPMotherCare + AtPFatherCare
   
@@ -60,7 +56,7 @@ GENDER <-
   
   #TRAUMAFAMILY =~ Death + Divorce
   
-  TRAUMAPOVERTY =~ Unemployment + Poverty + Homeless
+  TRAUMAPOVERTY =~ Unemployment + CantPayBills + Homeless
   
   TRAUMACRIME =~ Victim  + Touched
   
@@ -68,14 +64,14 @@ GENDER <-
   
   ### Regressions ###
   
-  AIncarceration ~ SCHOOL + AGGDELINQ + NADDELINQ + TRAUMACRIME  +
+  AIncarceration ~ AGGDELINQ + NADDELINQ + TRAUMACRIME  +
                    ESuspend + MSuspend + HSuspend  + Black + Citizenship + FamilySize + HighGrade15 + SES + Unemployment + JIncarceration
 
-  JIncarceration ~ SCHOOL + AGGDELINQ + NADDELINQ + TRAUMACRIME  +
+  JIncarceration ~ AGGDELINQ + NADDELINQ + TRAUMACRIME  +
                    ESuspend + MSuspend + HSuspend  + Black + Citizenship + FamilySize + HighGrade15 + SES + Unemployment
   "
 
-fit2 <- cfa(MODEL, data=waves, std.lv=TRUE, group="Gender")
+fit2 <- cfa(MODEL, data=Waves, std.lv=TRUE, group="Gender")
 summary(fit2, fit.measures=TRUE, standardized=TRUE)
 
 
