@@ -45,9 +45,9 @@ table(is.na(wave1$AID))
 
 # Remove the ALL=TRUE option to only keep obs in all data sets
 
-waves <- merge(wave1, wave2, by="AID", all=TRUE)
-waves <- merge(waves, wave3, by="AID", all=TRUE)
-waves <- merge(waves, wave4, by="AID", all=TRUE)
+waves <- merge(wave1, wave2, by="AID")
+waves <- merge(waves, wave3, by="AID")
+waves <- merge(waves, wave4, by="AID")
 
 "Calculating the Age:"
 

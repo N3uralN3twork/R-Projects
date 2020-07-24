@@ -2,7 +2,7 @@ library(lavaan)
 names(Waves)
 
 
-MODEL <- 
+FULL <- 
   "
   ### Latent Variables ###
   
@@ -37,42 +37,46 @@ MODEL <-
   NONAGGDELINQ ~ Gender.Coded + Black + Hispanic + Asian + Citizenship + Age + SES + TwoParentHome + HighestGrade
   "
 
-fit <- cfa(MODEL, data=Waves, std.lv=TRUE)
+fit <- cfa(FULL, data=Waves, std.lv=TRUE)
 summary(fit, fit.measures=TRUE, standardized=TRUE)
 exp(coef(fit))
 
 
+### By Gender ###
 GENDER <- 
   "
   ### Latent Variables ###
   
-  #PARENTATTACH =~ AtPCloseMother + AtPCloseFather + AtPMotherCare + AtPFatherCare
+  NONAGGDELINQ =~ NADLying + NADShoplift + NADStealLess + NADStealMore
   
-  DELINQPEERS =~ AtDPCigs + AtDPAlcohol + AtDPWeed
+  TRAUMAFAMILY =~ Divorce
   
-  AGGDELINQ =~ ADPhysicalFight + ADKnifeGun + ADShootStab + ADWeaponSchool
-  
-  NADDELINQ =~ NADLying + NADShoplift + NADStealLess + NADStealMore
-  
-  #TRAUMAFAMILY =~ Death + Divorce
-  
-  TRAUMAPOVERTY =~ Unemployment + CantPayBills + Homeless
-  
-  TRAUMACRIME =~ Victim  + Touched
-  
-  TRAUMAOTHER =~ BasicNeeds + HomeAlone + HurtFeelings
+  TRAUMAMALTREATMENT =~ Touched + SlapHitKick + BasicNeeds
   
   ### Regressions ###
   
-  AIncarceration ~ AGGDELINQ + NADDELINQ + TRAUMACRIME  +
-                   ESuspend + MSuspend + HSuspend  + Black + Citizenship + FamilySize + HighGrade15 + SES + Unemployment + JIncarceration
+  AIncarceration ~ NONAGGDELINQ + TRAUMAMALTREATMENT + 
+                   Black + Hispanic + Asian + Citizenship + Age + SES + TwoParentHome + HighestGrade + JIncarceration
 
-  JIncarceration ~ AGGDELINQ + NADDELINQ + TRAUMACRIME  +
-                   ESuspend + MSuspend + HSuspend  + Black + Citizenship + FamilySize + HighGrade15 + SES + Unemployment
+  JIncarceration ~ NONAGGDELINQ + TRAUMAMALTREATMENT + 
+                   Black + Hispanic + Asian + Citizenship + Age + SES + TwoParentHome + HighestGrade
   "
 
-fit2 <- cfa(MODEL, data=Waves, std.lv=TRUE, group="Gender")
+fit2 <- cfa(GENDER, data=Waves, std.lv=TRUE, group="Gender")
 summary(fit2, fit.measures=TRUE, standardized=TRUE)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
