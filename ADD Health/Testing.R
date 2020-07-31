@@ -1,25 +1,12 @@
 library(lavaan)
 
-# Adult Non-aggressive Delinquency
-ANonAD <- 
+MODEL <-
   "
-  ANonAD =~ AStealProperty + ADamageProperty + AStealLess + AStealMore
+  STEALING =~ JDStealLess + JDStealMore + JDStealStore
+  
+  DRUGS =~ JDDriveHigh + JDSellDrugs
   "
-fit4 <- cfa(ANonAD, data=Waves, std.lv=TRUE)
-summary(fit4, fit.measures=TRUE, standardized=TRUE)
-
-AAD <-
-  "
-  AAD =~ AShootStab + APhysicalFight + AKnifeGun + ASellDrugs
-  "
-fit4 <- cfa(AAD, data=Waves, std.lv=TRUE)
-summary(fit4, fit.measures=TRUE, standardized=TRUE)
-
-
-test <- 
-  "
-  AIncarceration ~ JIncarceration
-  "
-fit <- cfa(test, data=Waves, std.lv=TRUE)
+fit <- cfa(MODEL, data=waves, std.lv=TRUE)
 summary(fit, fit.measures=TRUE, standardized=TRUE)
 
+# They all load onto the same stealing/drug factors quite well.

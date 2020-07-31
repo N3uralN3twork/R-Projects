@@ -1,6 +1,8 @@
 library(lavaan)
 names(Waves)
 
+# CFI/TLI > 0.9 = Good
+# RMSEA < 0.05 = Good
 
 FULL <- 
   "
@@ -10,7 +12,7 @@ FULL <-
   
   NONAGGDELINQ =~ NADLying + NADShoplift + NADStealLess + NADStealMore
   
-  #TRAUMAFAMILY =~ Divorce
+  TRAUMAFAMILY =~ Death + Divorce
   
   TRAUMAPOVERTY =~ CantPayBills + Homeless
   
@@ -18,18 +20,22 @@ FULL <-
   
   TRAUMAMALTREATMENT =~ Touched + SlapHitKick + BasicNeeds
   
+  #HIGHSCHOOL =~ HSuspend + HighDropout
+  
   ### Correlations ###
   
   AGGDELINQ ~~ NONAGGDELINQ
   
   TRAUMAPOVERTY ~~ TRAUMAMALTREATMENT
   
+  #TRAUMACRIME ~~ TRAUMAPOVERTY
+  
   ### Regressions ###
   
-  AIncarceration ~ AGGDELINQ + NONAGGDELINQ + TRAUMAMALTREATMENT + TRAUMAPOVERTY + Victim + Divorce +
+  AIncarceration ~ AGGDELINQ + NONAGGDELINQ + TRAUMAMALTREATMENT + TRAUMAPOVERTY + TRAUMAFAMILY + 
                    Gender.Coded + Black + Hispanic + Asian + Citizenship + Age + SES + TwoParentHome + HighestGrade + JIncarceration
 
-  JIncarceration ~ AGGDELINQ + NONAGGDELINQ + TRAUMAMALTREATMENT + TRAUMAPOVERTY + Victim + Divorce +
+  JIncarceration ~ AGGDELINQ + NONAGGDELINQ + TRAUMAMALTREATMENT + TRAUMAPOVERTY + TRAUMAFAMILY + 
                    Gender.Coded + Black + Hispanic + Asian + Citizenship + Age + SES + TwoParentHome + HighestGrade
                    
   AGGDELINQ ~ Gender.Coded + Black + Hispanic + Asian + Citizenship + Age + SES + TwoParentHome + HighestGrade
@@ -41,6 +47,7 @@ fit <- cfa(FULL, data=Waves, std.lv=TRUE)
 summary(fit, fit.measures=TRUE, standardized=TRUE)
 exp(coef(fit))
 
+TRAUMACRIME =~ Victim + BioFatherJail + BioMotherJail + FigFatherJail + FigMotherJail
 
 ### By Gender ###
 GENDER <- 

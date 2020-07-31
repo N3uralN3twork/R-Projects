@@ -705,7 +705,7 @@ waves <- waves %>%
   mutate(ADKnifeGun = replace(H1FV7, H1FV7 %in% c(6,8,9), NA)) %>%
   mutate(ADShootStab = replace(H1FV8, H1FV8 %in% c(6,8,9), NA)) %>%
   mutate(ADWeaponSchool = replace(H1FV9, H1FV9 %in% c(6,8,9), NA)) %>%
-  mutate(NADLying = replace(H1DS5, H1DS5 %in% c(6,8,9), NA)) %>%
+  mutate(NADLying = replace(H1DS3, H1DS3 %in% c(6,8,9), NA)) %>%
   mutate(NADShoplift = replace(H1DS4, H1DS4 %in% c(6,8,9), NA)) %>%
   mutate(NADStealLess = replace(H1DS13, H1DS13 %in% c(6,8,9), NA)) %>%
   mutate(NADStealMore = replace(H1DS9, H1DS9 %in% c(6,8,9), NA))
@@ -1354,6 +1354,232 @@ waves <- waves %>%
   mutate(FosterHome = replace(H3OD31, H3OD31 %in% c(NA, 6, 8, 9), NA))
 table(waves$FosterHome)
 
+"Juvenile Delinquency:
+
+The prefix will be JD"
+
+# Drunk Driving:
+table(waves$H1JO9)
+
+waves <- waves %>%
+  mutate(JDDriveDrunk = case_when(
+    H1JO9 %in% c(6, 8) ~  NaN,
+    H1JO9 %in% c(0, 7) ~ 0,
+    H1JO9 == 1 ~ 1)) 
+
+table(waves$JDDriveDrunk)
+
+#############
+### Drugs ###
+#############
+
+# Driven while High on Drugs:
+
+waves <- waves %>%
+  mutate(JDDriveHigh = case_when(
+    H1JO19 %in% c(6, 8) ~ NaN,
+    H1JO19 %in% c(0, 7) ~ 0,
+    H1JO19 == 1 ~ 1))
+
+table(waves$JDDriveHigh)
+
+# Sell Marijuana / Other Drugs in Wave 1:
+
+waves <- waves %>%
+  mutate(JDSellDrugs = case_when(
+    H1DS12 %in% c(6, 8, 9) ~ NaN,
+    H1DS12 == 0 ~ 0,
+    H1DS12 %in% c(1,2,3) ~ 1))
+
+table(waves$JDSellDrugs)
+
+# Use illegal drugs in past 30 days:
+
+waves <- waves %>%
+  mutate(JDIllegalDrugUse = case_when(
+    H1TO42 %in% c(996, 998, 999) ~ NaN,
+    H1TO42 %in% c(0, 997) ~ 0,
+    H1TO42 %in% seq(1, 900) ~ 1))
+
+table(waves$JDIllegalDrugUse)
+
+# Cocaine use:
+
+waves <- waves %>%
+  mutate(JDCocaineUse = case_when(
+    H1TO35 %in% c(996, 998, 999) ~ NaN,
+    H1TO35 == 997 ~ 0,
+    TRUE ~ 1))
+
+table(waves$JDCocaineUse)
+
+# Using illegal drugs via a Needle:
+
+waves <- waves %>%
+  mutate(JDIllegalDrugNeedle = case_when(
+    H1TO43 %in% c(6, 8, 9) ~ NaN,
+    H1TO43 %in% c(0, 7) ~ 0,
+    H1TO43 == 1 ~ 1))
+
+table(waves$JDIllegalDrugNeedle)
+
+# Alone first time drug use:
+
+waves <- waves %>%
+  mutate(JDAloneDrugUse = case_when(
+    H1JO24 %in% c(6, 8) ~ NaN,
+    H1JO24 %in% c(0, 7) ~ 0,
+    H1JO24 == 1 ~ 1))
+
+table(waves$JDAloneDrugUse)
+
+# Fight while on drugs:
+
+waves <- waves %>%
+  mutate(JDFightOnDrugs = case_when(
+    H1JO21 %in% c(6, 8) ~ NaN,
+    H1JO21 %in% c(0, 7) ~ 0,
+    H1JO21 == 1 ~ 1))
+
+table(waves$JDFightOnDrugs)
+
+# Carrying a weapon while on drugs:
+
+waves <- waves %>%
+  mutate(JDWeaponOnDrugs = case_when(
+    H1JO23 %in% c(6, 8) ~ NaN,
+    H1JO23 %in% c(0, 7) ~ 0,
+    H1JO23 == 1 ~ 1))
+
+table(waves$JDWeaponOnDrugs)
+
+
+################
+### STEALING ###
+################
+
+# Stealing something less than $50:
+waves <- waves %>%
+  mutate(JDStealLess = case_when(
+    H1DS13 %in% c(6, 8, 9) ~ NaN,
+    H1DS13 == 0 ~ 0,
+    H1DS13 %in% c(1, 2, 3) ~ 1))
+
+table(waves$JDStealLess)
+
+# Stealing something more than $50 in past 12 months:
+
+waves <- waves %>%
+  mutate(JDStealMore = case_when(
+    H1DS9 %in% c(6, 8, 9) ~ NaN,
+    H1DS9 == 0 ~ 0,
+    H1DS9 %in% c(1, 2, 3) ~ 1))
+
+table(waves$JDStealMore)
+
+# Stealing from a store:
+
+waves <- waves %>%
+  mutate(JDStealStore = case_when(
+    H1DS4 %in% c(6, 8, 9) ~ NaN,
+    H1DS4 == 0 ~ 0,
+    H1DS4 %in% c(1, 2, 3) ~ 1))
+
+table(waves$JDStealStore)
+
+
+#############
+### OTHER ###
+#############
+
+# Pulled a knife/gun on someone past 12 months:
+waves <- waves %>%
+  mutate(JDKnifeGun = case_when(
+    H1FV7 %in% c(6, 8, 9) ~ NaN,
+    H1FV7 == 0 ~ 0,
+    H1FV7 %in% c(1, 2) ~ 1))
+
+table(waves$JDKnifeGun)
+
+
+# You shot/stabbed someone past 12 months:
+waves <- waves %>%
+  mutate(JDShootStab = case_when(
+    H1FV8 %in% c(6, 8, 9) ~ NaN,
+    H1FV8 == 0 ~ 0,
+    H1FV8 %in% c(1, 2) ~ 1))
+
+table(waves$JDShootStab)
+
+
+# Lie to parents/guardians about whereabouts past 12 months:
+waves <- waves %>%
+  mutate(JDLying = case_when(
+    H1DS3 %in% c(6, 8, 9) ~ NaN,
+    H1DS3 == 0 ~ 0,
+    H1DS3 %in% c(1, 2, 3) ~ 1))
+
+table(waves$JDLying)
+
+
+# Physical Fight past 12 months:
+waves <- waves %>%
+  mutate(JDPhysicalFight = case_when(
+    H1JO11 %in% c(6, 8) ~ NaN,
+    H1JO11 %in% c(0, 7) ~ 0,
+    H1JO11 == 1 ~ 1))
+
+table(waves$JDPhysicalFight)
+
+
+# Serious Physical Fight past 12 months:
+waves <- waves %>%
+  mutate(JDSeriousPhysicalFight = case_when(
+    H1DS5 %in% c(6, 8, 9) ~ NaN,
+    H1DS5 == 0 ~ 0,
+    H1DS5 %in% c(1, 2, 3) ~ 1))
+
+table(waves$JDSeriousPhysicalFight)
+
+# Damage Property past 12 months:
+waves <- waves %>%
+  mutate(JDDamageProperty = case_when(
+    H1DS2 %in% c(6, 8, 9) ~ NaN,
+    H1DS2 == 0 ~ 0,
+    H1DS2 %in% c(1, 2, 3) ~ 1))
+
+table(waves$JDDamageProperty)
+
+# Used a weapon in a fight:
+waves <- waves %>%
+  mutate(JDWeaponFight = case_when(
+    H1JO26 %in% c(6, 8, 9) ~ NaN,
+    H1JO26 == 0 ~ 0,
+    H1JO26 == 1 ~ 1))
+
+table(waves$JDWeaponFight)
+
+
+# Hurt Someone Badly Enough past 12 months:
+waves <- waves %>%
+  mutate(JDHurtBadly = case_when(
+    H1DS6 %in% c(6, 8, 9) ~ NaN,
+    H1DS6 == 0 ~ 0,
+    H1DS6 %in% c(1, 2, 3) ~ 1))
+
+table(waves$JDHurtBadly)
+
+
+# Paint graffiti past 12 months:
+waves <- waves %>%
+  mutate(JDGraffitPaint = case_when(
+    H1DS1 %in% c(6, 8, 9) ~ NaN,
+    H1DS1 == 0 ~ 0,
+    H1DS1 %in% c(1, 2, 3) ~ 1))
+
+table(waves$JDGraffitPaint)
+
+
 "Juvenile Incarceration:"
 
 # 0 = No
@@ -1392,19 +1618,7 @@ variables <- as.data.frame(names(waves))
 "Select only the necessary variables:"
 attach(waves)
 Waves <- waves %>%
-  select(AID, PA10, PA12, S1, S6B, S2, S4, IMONTH, IDAY, IYEAR,
-         H1GI1Y, H1GI6B, H1GI11, H1GI14, H1GI21, H1IR12, H1FV3,
-         H1GI4, H1JO11, H1DS5, H1DS2, H1TO53, H1DS12, H1DS13, H1DS9,
-         H2GI10, H2IR12, H2FV1, H2DS10, H2DS11, H3DA31,
-         H3DS8, H3OD4B, BIO_SEX3, H3HR24, H3HR25, H3ID32,
-         H3ID30, H3ID29, H3CJ5, H3DS16, H3CJ108A, H3LM7,
-         H4DS8, H4CJ9I, H4DS1, H4DS2, H4DS5, H4DS6, H4DS19, H4CJ25M, H4DS5, H4DS6, H4DS2,
-         H4WP28, H4CJ20, H4ED2, H4CJ1, H4CJ6, H4CJ17, H4CJ24M, H4LM11, H1FV7, H1FV8, 
-         H1FV9, H1DS5, H1DS4, H1DS13, H1DS9,
-         H1WP9, H1WP13, H1WP10, H1WP14, H1ED19,
-         H1ED20, H1ED22, H1ED23, H1TO33, H1TO9,
-         H1TO29, H1ED11, H1ED12, H1ED13, H1ED14,
-         H3MA1, H3MA2, H3MA3, H3MA4, H4MA1, H4WP3, H4WP9, H4WP16, H4WP30,
+  select(AID, H1GI1Y,
          PEducation, Race, Black, Asian, Age, Geography, Gender, Gender.Coded, Hispanic, Citizenship,
          EverSuspend, Divorce, JIncarceration, AIncarceration, FirstIncarcAge, TwoParentHome,
          P1Education, P2Education, SES, JIncarceMonths, AIncarceMonths, AEmployed,
@@ -1422,7 +1636,11 @@ Waves <- waves %>%
          JVictim, AVictim, Victim, CantPayBills, BasicNeeds, HomeAlone, SlapHitKick,
          Touched, HurtFeelings, BioFatherJail, BioMotherJail, FigFatherJail, FigMotherJail,
          BingeDrink, Trauma, Homeless, AStealMore, AStealLess, AStealProperty, ADamageProperty,
-         AShootStab, APhysicalFight, AKnifeGun, ASellDrugs, FosterHome)
+         AShootStab, APhysicalFight, AKnifeGun, ASellDrugs, FosterHome,
+         JDDriveDrunk, JDDriveHigh, JDSellDrugs, JDIllegalDrugUse, JDCocaineUse, JDIllegalDrugNeedle,
+         JDAloneDrugUse, JDFightOnDrugs, JDWeaponOnDrugs, JDStealLess, JDStealMore, JDStealStore,
+         JDKnifeGun, JDShootStab, JDLying, JDPhysicalFight, JDSeriousPhysicalFight, JDDamageProperty,
+         JDWeaponFight, JDHurtBadly, JDGraffitPaint)
 
 "Rename some of the variables:"
 #New = Old
@@ -1432,7 +1650,7 @@ Waves <- Waves %>%
 attach(Waves)
 
 names(Waves)
-
+vars <- data.frame(names(Waves))
 ##############################
 ### Descriptive Statistics ###
 ##############################
