@@ -1,7 +1,7 @@
 ###############################
 ### Load Data and Libraries ###
 ###############################
-"Sources: https://www.cpc.unc.edu/projects/addhealth/faqs/aboutdata/index.html#what-is-the-best"
+Sources: https://www.cpc.unc.edu/projects/addhealth/faqs/aboutdata/index.html#what-is-the-best
 
 "Read in the data and necessary libraries:"
 setwd("C:/Users/miqui/OneDrive/R Projects/ADD Health")
