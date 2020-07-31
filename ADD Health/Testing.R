@@ -4,7 +4,8 @@ MODEL <-
   "
   STEALING =~ JDStealLess + JDStealMore + JDStealStore
   
-  DRUGS =~ JDDriveHigh + JDSellDrugs
+  DRUGS =~ JDDriveDrunk + JDDriveHigh + JDSellDrugs + JDIllegalDrugUse + JDCocaineUse + 
+           JDIllegalDrugNeedle + JDAloneDrugUse + JDFightOnDrugs + JDWeaponOnDrugs
   "
 fit <- cfa(MODEL, data=Waves, std.lv=TRUE)
 summary(fit, fit.measures=TRUE, standardized=TRUE)

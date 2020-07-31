@@ -2,7 +2,7 @@ library(lavaan)
 names(Waves)
 
 # CFI/TLI > 0.9 = Good
-# RMSEA < 0.05 = Good\
+# RMSEA < 0.05 = Good
 # Look @ the std.all column
 
 FULL <- 
