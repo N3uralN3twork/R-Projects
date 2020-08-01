@@ -12,4 +12,3 @@ summary(fit, fit.measures=TRUE, standardized=TRUE)
 
 # They all load onto the same stealing/drug factors quite well.
 
-
