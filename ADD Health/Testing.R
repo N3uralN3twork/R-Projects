@@ -1,14 +1,18 @@
-library(lavaan)
+library(randomizeR)
+library(randomizr)
+library(dplyr)
 
-MODEL <-
-  "
-  STEALING =~ JDStealLess + JDStealMore + JDStealStore
-  
-  DRUGS =~ JDDriveDrunk + JDDriveHigh + JDSellDrugs + JDIllegalDrugUse + JDCocaineUse + 
-           JDIllegalDrugNeedle + JDAloneDrugUse + JDFightOnDrugs + JDWeaponOnDrugs
-  "
-fit <- cfa(MODEL, data=Waves, std.lv=TRUE)
-summary(fit, fit.measures=TRUE, standardized=TRUE)
+# Printing out the codes:
+for (i in seq(1, 30)){
+  if (i < 10){
+    print(paste("AAA", i, sep = "0"))
+  } else {
+    print(paste("AAA", i, sep = ""))
+  }
+}
 
-# They all load onto the same stealing/drug factors quite well.
+# Assigning random treatment/control:
+TLC <- data.frame(TorC = sample(t(rep(c("T", "C"), 15))))
+test$ID <- paste(matt$ID, TLC$TorC, sep = "")
+
 
