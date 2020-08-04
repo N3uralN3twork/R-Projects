@@ -1578,6 +1578,213 @@ waves <- waves %>%
 
 table(waves$JDGraffitPaint)
 
+"Adult Crime:"
+
+# Adult steal more than $50 in past 12 months:
+
+table(waves$H4DS2)
+
+waves <- waves %>%
+  mutate(AdultStealMore = case_when(
+    H4DS2 %in% c(6, 8) ~ NaN,
+    H4DS2 == 0 ~ 0,
+    H4DS2 %in% c(1, 2, 3) ~ 1))
+
+table(waves$AdultStealMore)
+
+# Adult steal less than $50 in past 12 months:
+
+table(H4DS6)
+
+waves <- waves %>%
+  mutate(AdultStealLess = case_when(
+    H4DS6 %in% c(6, 8) ~ NaN,
+    H4DS6 == 0 ~ 0,
+    H4DS6 %in% c(1, 2, 3) ~ 1))
+
+table(waves$AdultStealLess)
+
+
+# Adult pulled a knife/gun on someone past 12 months:
+
+table(waves$H4DS19)
+
+waves <- waves %>%
+  mutate(AdultGun = case_when(
+    H4DS19 %in% c(6, 8) ~ NaN,
+    H4DS19 == 0 ~ 0,
+    H4DS19 == 1 ~ 1))
+
+table(waves$AdultGun)
+
+
+# Adult shoot/stab someone past 12 months:
+
+table(waves$H4DS20)
+
+waves <- waves %>%
+  mutate(AdultShootStab = case_when(
+    H4DS20 %in% c(6, 8) ~ NaN,
+    H4DS20 == 0 ~ 0,
+    H4DS20 == 1 ~ 1))
+
+table(waves$AdultShootStab)
+
+
+# Adult Stolen/Other Property:
+
+table(waves$H4DS8)
+table(waves$H3DS8)
+
+waves <- waves %>%
+  mutate(AH4DS8 = case_when(
+    H4DS8 %in% c(6, 8) ~ NaN,
+    H4DS8 == 0 ~ 0,
+    H4DS8 %in% c(1, 2, 3) ~ 1)) %>%
+  mutate(AH3DS8 = case_when(
+    H3DS8 %in% c(6, 8, 9) ~ NaN,
+    H3DS8 == 0 ~ 0,
+    H3DS8 %in% c(1, 2, 3) ~ 1)) %>%
+  mutate(AdultOtherProperty = case_when(
+    is.na(AH3DS8) & is.na(AH4DS8) ~ NaN,
+    AH3DS8 == 1 | AH4DS8 == 1 ~ 1,
+    TRUE ~ 0))
+
+table(waves$AdultOtherProperty)
+
+
+# Adult Physical Attack:
+
+# If either one is TRUE, then APhysicalAttack is 1
+
+table(waves$H4DS11)
+table(waves$H3DS16)
+
+waves <- waves %>%
+  mutate(AH3DS16 = case_when( # First fighting variable
+    H3DS16 %in% c(96, 98, 99) ~ NaN,
+    H3DS16 == 0 ~ 0,
+    H3DS16 %in% seq(1, 56) ~ 1)) %>%
+  mutate(AH4DS11= case_when( # Second fighting variable
+    H4DS11 %in% c(6, 8) ~ NaN,
+    H4DS11 == 0 ~ 0,
+    H4DS11 %in% c(1, 2, 3) ~ 1)) %>%
+  mutate(AdultPhysicalAttack = case_when(
+    is.na(AH3DS16) & is.na(AH4DS11) ~ NaN,
+    AH3DS16 == 0 & AH4DS11 == 0 ~ 0,
+    AH3DS16 == 1 | AH4DS11 == 1 ~ 1,
+    TRUE ~ NaN))
+
+table(waves$AdultPhysicalAttack)
+
+# Adult Attack:
+
+table(waves$H4CJ9I)
+
+waves <- waves %>%
+  mutate(AdultAttack = case_when(
+    H4CJ9I %in% c(6, 8) ~ NaN,
+    H4CJ9I %in% c(0, 7) ~ 0,
+    H4CJ9I == 1 ~ 1))
+
+table(waves$AdultAttack)
+
+
+# Adult Destroy Property:
+
+table(waves$H4DS1)
+
+waves <- waves %>%
+  mutate(AdultDestroyProperty = case_when(
+    H4DS1 %in% c(6, 8)  ~ NaN,
+    H4DS1 == 0 ~ 0,
+    H4DS1 %in% c(1, 2, 3) ~ 1))
+
+table(waves$AdultDestroyProperty)
+
+
+
+# Adult Sell Drugs:
+
+# H3DS5 in (1, 2, 3) or H4DS5 in (1, 2, 3) THEN AdultSellDrugs == 1
+
+table(waves$H3DS5)
+table(waves$H4DS5)
+
+waves <- waves %>%
+  mutate(AH3DS5 = case_when(
+    H3DS5 %in% c(6, 8, 9) ~ NaN,
+    H3DS5 == 0 ~ 0,
+    H3DS5 %in% c(1, 2, 3) ~ 1)) %>%
+  mutate(AH4DS5 = case_when(
+    H4DS5	%in% c(6, 8) ~ NaN,
+    H4DS5	== 0 ~ 0,
+    H4DS5	 %in% c(1, 2, 3) ~ 1)) %>%
+  mutate(AdultSellDrugs = case_when(
+    is.na(AH3DS5) & is.na(AH4DS5) ~ NaN,
+    AH3DS5 == 0 & AH4DS5 == 0 ~ 0,
+    AH3DS5 == 1 | AH4DS5 == 1 ~ 1,
+    TRUE ~ NaN))
+
+table(waves$AdultSellDrugs)
+
+
+# Adult Stolen Credit/ATM Card:
+
+# 1 == if H3DS9 in (1, 2, 3) or H4DS9 in (1, 2, 3)
+table(waves$H3DS9)
+table(waves$H4DS9)
+
+waves <- waves %>%
+  mutate(AH3DS9 = case_when( # Wave 3
+    H3DS9 %in% c(6, 8, 9) ~ NaN,
+    H3DS9 == 0 ~ 0,
+    H3DS9 %in% c(1, 2 ,3) ~ 1)) %>%
+  mutate(AH4DS9 = case_when( # Wave 4
+    H4DS9 %in% c(6, 8) ~ NaN,
+    H4DS9 == 0 ~ 0,
+    H4DS9 %in% c(1, 2, 3) ~ 1)) %>%
+  mutate(AdultStolenCard = case_when(
+    is.na(AH3DS9) & is.na(AH4DS9) ~ NaN,
+    AH3DS9 == 0 & AH4DS9 == 0 ~ 0,
+    AH3DS9 == 1 | AH4DS9 == 1 ~ 1,
+    TRUE ~ NaN))
+
+table(waves$AdultStolenCard)
+
+"Creating Generalized Aggressive/Non-Aggressive Crime Variables:"
+
+# Crime:
+
+# AC = Aggressive Crime
+# NAC = Non-aggressive Crime
+
+waves <- waves %>%
+  mutate(ACPhysicalAttack = replace(H4DS11, H4DS11 %in% c(6, 8), NaN)) %>%
+  mutate(ACGun = AdultGun) %>%
+  mutate(ACShootStab = AdultShootStab) %>%
+  mutate(ACAttack = AdultAttack) %>%
+  mutate(NACOtherProperty1 = replace(H4DS8, H4DS8 %in% c(6, 8), NaN)) %>%
+  mutate(NACOtherProperty2 = replace(H3DS8, H3DS8 %in% c(6, 8, 9), NaN)) %>%
+  mutate(NACOtherProperty = NACOtherProperty1 + NACOtherProperty2) %>%
+  mutate(NACStealLess = replace(H4DS6, H4DS6 %in% c(6, 8), NaN)) %>%
+  mutate(NACStealMore = replace(H4DS2, H4DS2 %in% c(6, 8), NaN))
+
+table(waves$ACPhysicalAttack)
+table(waves$ACGun)
+table(waves$ACShootStab)
+table(waves$ACAttack)
+table(waves$NACOtherProperty)
+table(waves$NACStealLess)
+table(waves$NACStealMore)
+
+waves <- waves %>%
+  mutate(AggCrime = ACPhysicalAttack + ACGun + ACShootStab + ACAttack) %>%
+  mutate(NonAggCrime = NACOtherProperty + NACStealLess + NACStealMore)
+
+table(waves$AggCrime)
+table(waves$NonAggCrime)
+
 
 "Juvenile Incarceration:"
 
@@ -1639,7 +1846,9 @@ Waves <- waves %>%
          JDDriveDrunk, JDDriveHigh, JDSellDrugs, JDIllegalDrugUse, JDCocaineUse, JDIllegalDrugNeedle,
          JDAloneDrugUse, JDFightOnDrugs, JDWeaponOnDrugs, JDStealLess, JDStealMore, JDStealStore,
          JDKnifeGun, JDShootStab, JDLying, JDPhysicalFight, JDSeriousPhysicalFight, JDDamageProperty,
-         JDWeaponFight, JDHurtBadly, JDGraffitPaint)
+         JDWeaponFight, JDHurtBadly, JDGraffitPaint, AdultStealMore, AdultStealLess, AdultGun, AdultShootStab,
+         AdultOtherProperty, AdultPhysicalAttack, AdultAttack, AdultDestroyProperty, AdultSellDrugs,
+         AdultStolenCard, AggCrime, NonAggCrime)
 
 "Rename some of the variables:"
 #New = Old

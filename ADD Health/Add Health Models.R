@@ -48,7 +48,27 @@ fit <- cfa(FULL, data=Waves, std.lv=TRUE)
 summary(fit, fit.measures=TRUE, standardized=TRUE)
 exp(coef(fit))
 
-TRAUMACRIME =~ Victim + BioFatherJail + BioMotherJail + FigFatherJail + FigMotherJail
+### Delinquency and Crime ###
+JDCrime <- 
+  "
+  ### Latent Variables ###
+  
+  ALCOHOL =~ JDDriveDrunk
+  
+  DRUGS =~ JDDriveHigh + JDSellDrugs + JDIllegalDrugUse + JDCocaineUse + JDIllegalDrugNeedle +
+           JDAloneDrugUse + JDFightOnDrugs + JDWeaponOnDrugs
+           
+  DELINQUENCY =~ JDDamageProperty + JDStealLess + JDStealMore + JDHurtBadly + JDSellDrugs
+  
+  CRIME =~ AdultGun + AdultDestroyProperty + AdultStealLess + AdultStealMore + AdultOtherProperty + 
+           AdultAttack + AdultSellDrugs + AdultPhysicalAttack + AdultStolenCard
+  "
+
+fit <- cfa(JDCrime, data=Waves, std.lv=TRUE)
+summary(fit, fit.measures=TRUE, standardized=TRUE)
+
+
+
 
 ### By Gender ###
 GENDER <- 
