@@ -930,7 +930,7 @@ summary(waves$AcadPerform)
 
 "Variables included"
 
-# 1. You were shot/stabbed:
+# 1. You were cut/shot/stabbed:
 table(waves$H1FV3)
 table(waves$H1FV4)
 table(waves$H2FV3)
@@ -1233,6 +1233,16 @@ waves <- waves %>%
   mutate(FigMotherJail = replace(H4WP16, H4WP16 %in% c(7, 8), NA))
 
 table(waves$FigMotherJail)
+
+# Any parental figure incarcerated:
+
+waves <- waves %>%
+  mutate(aceParentJail = case_when(
+    is.na(BioMotherJail) & is.na(BioFatherJail) & is.na(FigMotherJail) & is.na(FigFatherJail) ~ NaN,
+    BioMotherJail == 1 | BioFatherJail == 1 | FigMotherJail == 1 | FigFatherJail == 1 ~ 1,
+    TRUE ~ 0))
+
+table(waves$aceParentJail)
 
 "Parent Binge Drinker:"
 
@@ -1786,6 +1796,88 @@ table(waves$AggCrime)
 table(waves$NonAggCrime)
 
 
+"Adverse Childhood Experiences:"
+
+# Supervisory Neglect:
+
+table(Waves$HomeAlone)
+
+# Emotional Neglect:
+
+table(waves$H1PF23)
+table(waves$H1PF1)
+
+waves <- waves %>%
+  mutate(aceEmotionalNeglect1 = case_when(
+    H1PF23 %in% c(6, 7, 8, 9) ~ NaN,
+    H1PF23 %in% c(4, 5) ~ 0,
+    TRUE ~ 1)) %>%
+  mutate(aceEmotionalNeglect2 = case_when(
+    H1PF1 %in% c(6, 7, 8) ~ NaN,
+    H1PF1 %in% c(4, 5) ~ 0,
+    TRUE ~ 1)) %>%
+  mutate(aceEmotionalNeglect = case_when(
+    is.na(aceEmotionalNeglect1) & is.na(aceEmotionalNeglect2) ~ NaN,
+    aceEmotionalNeglect1 == 1 | aceEmotionalNeglect2 == 1 ~ 1,
+    TRUE ~ 0))
+
+table(waves$aceEmotionalNeglect)
+
+# Physical Abuse:
+table(Waves$SlapHitKick)
+
+# Emotional Abuse:
+table(Waves$HurtFeelings)
+
+# Sexual Abuse:
+table(Waves$Touched)
+
+# Suicidal Attempt of Household Adults:
+table(waves$H1SU6)
+
+waves <- waves %>%
+  mutate(aceSuicide = case_when(
+    H1SU6 %in% c(6, 8, 9) ~ NaN,
+    H1SU6 == 0 ~ 0,
+    H1SU6 == 1 ~ 1))
+
+table(waves$aceSuicide)
+# Parental Alcohol Misuse:
+table(Waves$BingeDrink)
+
+# Parental Separation/Divorce:
+table(Waves$Divorce)
+
+# Household Adult Incarceration:
+table(waves$H4WP3)
+table(waves$H4WP30)
+table(waves$H4WP16)
+table(waves$H4WP9)
+
+# Experience in the Foster Care System:
+table(Waves$FosterHome)
+
+# Direct Witnessing of Violence:
+table(waves$JH1FV1)
+
+# Being the Victim of Violence:
+table(waves$JH1FV2)
+table(waves$JH1FV3)
+table(waves$JH1FV4)
+
+waves <- waves %>%
+  mutate(aceVictim = case_when(
+    is.na(JH1FV2) & is.na(JH1FV3) & is.na(JH1FV4) ~ NaN,
+    JH1FV2 == 1 | JH1FV3 == 1 | JH1FV4 == 1 ~ 1,
+    TRUE ~ 0))
+
+table(waves$aceVictim)
+
+
+
+
+
+
 "Juvenile Incarceration:"
 
 # 0 = No
@@ -1848,13 +1940,16 @@ Waves <- waves %>%
          JDKnifeGun, JDShootStab, JDLying, JDPhysicalFight, JDSeriousPhysicalFight, JDDamageProperty,
          JDWeaponFight, JDHurtBadly, JDGraffitPaint, AdultStealMore, AdultStealLess, AdultGun, AdultShootStab,
          AdultOtherProperty, AdultPhysicalAttack, AdultAttack, AdultDestroyProperty, AdultSellDrugs,
-         AdultStolenCard, AggCrime, NonAggCrime)
+         AdultStolenCard, ACPhysicalAttack, ACGun, ACShootStab, ACAttack, NACOtherProperty, NACStealLess,
+         NACStealMore, AggCrime, NonAggCrime, aceEmotionalNeglect, aceSuicide, aceVictim, JH1FV1,
+         aceParentJail)
 
 "Rename some of the variables:"
 #New = Old
 
 Waves <- Waves %>%
-          rename(BirthYear = H1GI1Y)
+          rename(BirthYear = H1GI1Y,
+                 aceWitnessViolence = JH1FV1)
 attach(Waves)
 
 names(Waves)
