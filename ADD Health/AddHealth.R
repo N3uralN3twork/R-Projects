@@ -1886,7 +1886,7 @@ table(waves$aceVictim)
 
 waves <- waves %>%
   mutate(JIncarceration = case_when(
-    H4CJ5 %in% c(996, 998) ~ NaN,
+    H4CJ5 %in% c(996, 998) ~ NA_real_,
     H4CJ5 == 997 ~ 0,
     H4CJ5 %in% seq(1, 95) ~ 1))
 
@@ -1902,7 +1902,7 @@ table(is.na(waves$JIncarceration))
 waves <- waves %>%
   mutate(AIncarceration = case_when(
     is.na(H4CJ6) ~ NaN,
-    H4CJ6 %in% c(96, 98) ~ NaN,
+    H4CJ6 %in% c(96, 98) ~ NA_real_,
     H4CJ6 == 97 ~ 0,
     H4CJ6 %in% seq(1,90) ~ 1))
 
@@ -1954,6 +1954,10 @@ attach(Waves)
 
 names(Waves)
 vars <- data.frame(names(Waves))
+
+Waves <- waves %>%
+  select(JIncarceration, Victim, Divorce, Gender, Black, Hispanic, Asian) %>%
+  mutate_if(is.double, as.factor)
 ##############################
 ### Descriptive Statistics ###
 ##############################

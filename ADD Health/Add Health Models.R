@@ -44,7 +44,7 @@ FULL <-
   NONAGGDELINQ ~ Gender.Coded + Black + Hispanic + Asian + Citizenship + Age + SES + TwoParentHome + HighestGrade
   "
 
-fit <- cfa(FULL, data=Waves, std.lv=TRUE)
+fit <- cfa(FULL, data=Waves, std.lv=TRUE, sampling.weights = )
 summary(fit, fit.measures=TRUE, standardized=TRUE)
 exp(coef(fit))
 
@@ -95,21 +95,6 @@ summary(fit2, fit.measures=TRUE, standardized=TRUE)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Cronbach's Alpha
 NAD <- Waves %>%
   select(NADLying, NADShoplift, NADStealLess, NADStealMore)
@@ -120,24 +105,21 @@ alpha(NAD)
 ### Logistic Regression Models ###
 ##################################
 
-"Being Black:"
-
-AIBlack <- glm(
-  AIncarceration ~ Black,
+model <- glm(
+  formula = AIncarceration ~ JIncarceration + Age + Victim + Divorce + Gender + Black + Hispanic + Asian + HighestGrade,
   data = Waves,
   family = binomial(link = "logit"))
 
-summary(AIBlack)
-exp(coef(AIBlack))
-"The odds of being incarcerated as an adult are 1.44 times
-higher if you are black than if you are not."
+model
+summary(model)
+
+# The reason for the difference between R and SAS is that R thinks that the 
+# binary variables are all double-precision variables.
+
+# Evidence:
+typeof(Waves$JIncarceration)
 
 
-"Full Model:"
 
-AIFull <- glm(
-  AIncarceration ~  as.factor(JIncarceration),
-  data = waves,
-  family = binomial(link = "logit"))
 
-summary(AIFull)
+
