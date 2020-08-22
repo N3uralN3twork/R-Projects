@@ -1,4 +1,3 @@
-[link](https://cran.r-project.org/web/packages/caret/vignettes/caret.html)
 library(caret)
 library(mlbench)
 data("Sonar")

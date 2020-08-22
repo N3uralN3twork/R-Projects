@@ -1955,9 +1955,9 @@ attach(Waves)
 names(Waves)
 vars <- data.frame(names(Waves))
 
-Waves <- waves %>%
+'Waves <- waves %>%
   select(JIncarceration, Victim, Divorce, Gender, Black, Hispanic, Asian) %>%
-  mutate_if(is.double, as.factor)
+  mutate_if(is.double, as.factor)'
 ##############################
 ### Descriptive Statistics ###
 ##############################
@@ -1970,7 +1970,7 @@ str(Waves)
 Waves %>%
   group_by(Gender) %>%
   summarize(mean = mean(Age, na.rm = TRUE),
-            sd = sd(Age, na.rm = TRUE),
+            sd = sd(Age, na.rm = TRUE),f
             median = median(Age, na.rm = TRUE),
             IQR = IQR(Age, na.rm = TRUE))
 
