@@ -49,3 +49,26 @@ mermaid("
         style C fill:#ADF, stroke:#333, stroke-width:2px
         style E fill:#9C2, stroke:#9C2, stroke-width:2px
         ")
+
+mermaid("
+        graph LR
+        A(Card)-->B(1)
+        A-->C(2)
+        A-->D(3)
+        A-->E(4)
+        A-->F(5)
+        A-->G(6)
+        B--0.1-->H(Red)
+        B--1/15-->I(White)
+        C--0.1-->J(Red)
+        C--1/15-->K(White)
+        D--0.1-->L(Red)
+        D--1/15-->M(White)
+        E--1/15-->N(Red)
+        E--0.05-->O(White)
+        E--0.05-->P(Black)
+        F--0.1-->Q(Red)
+        F--1/15-->R(White)
+        G--0.1-->S(Red)
+        G--1/15-->T(White)")
+
