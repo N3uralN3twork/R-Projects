@@ -24,6 +24,7 @@ attach(dataset)
 dataset$MSA97 = as.character(dataset$MSA97)
 dataset$gender <- as.character(dataset$gender)
 table(dataset$gender) #3,393 0's and 3,342 1's
+table(dataset$citizenship)
 
 
 ######  MODEL ###### 
