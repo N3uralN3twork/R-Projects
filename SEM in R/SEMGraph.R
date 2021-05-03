@@ -12,6 +12,14 @@ C-->E[Rectangle Two]
 ")
 
 
+# Creating the tree structure for a system.
+mermaid("
+        graph TD
+        A(Rounded) --> B[On]
+        A --> C[Off]
+        ")
+
+
 # (()) = circle
 # {} = rhombus
 # 

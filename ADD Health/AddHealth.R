@@ -1970,7 +1970,7 @@ str(Waves)
 Waves %>%
   group_by(Gender) %>%
   summarize(mean = mean(Age, na.rm = TRUE),
-            sd = sd(Age, na.rm = TRUE),f
+            sd = sd(Age, na.rm = TRUE),
             median = median(Age, na.rm = TRUE),
             IQR = IQR(Age, na.rm = TRUE))
 
