@@ -122,13 +122,13 @@ adultincarceration ~  TRAUMACRIME + TRAUMAPOVERTY + TRAUMAFAMILY + ELEMSCHOOL + 
 '
 #############END MODEL#############
 
-lavaOne <- cfa(Model1, data = dataset , std.lv = TRUE)
+lavaOne <- cfa(Model1, data = dataset, std.lv = TRUE)
 summary(lavaOne, standardized=TRUE, fit.measures = TRUE)
 
 lavaPerf <- model_performance(lavaOne)
 
 
-
+lavaPerf
 
 
 
