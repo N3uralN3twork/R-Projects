@@ -1,0 +1,107 @@
+---
+title: "MapMakingInR"
+author: "Matthias Quinn"
+date: "3/7/2022"
+output: 
+  html_document: 
+    toc: yes
+    theme: cerulean
+    fig_caption: yes
+    df_print: kable
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[Philiadelphia Mapping Source](https://cengel.github.io/R-spatial/mapping.html)
+
+[US Census Shape Files](https://www.census.gov/cgi-bin/geo/shapefiles/index.php)
+
+[Duke - Thematic Mapping in R](https://map-rfun.library.duke.edu/031_thematic_mapping.html)
+
+## Load Libraries:
+
+```{r}
+# Load in the necessary libraries:
+library(dplyr)
+library(ggplot2)
+library(tigris)
+library(sf)
+library(leaflet)
+library(RColorBrewer)
+library(classInt)
+```
+
+```{r}
+setwd("C:/Users/miqui/OneDrive/R Projects/Map Making/Philidelphia")
+# Read in the shape files:
+PhilCrimes <- st_read("Data/PhillyCrimerate")
+```
+
+Prepare the Philadelphia data for mapping:
+
+1.  Transform into the 4326 code format
+2.  Create a quantile distribution for the different colors of our response variable
+3.  Create a display message when rendering the map
+
+```{r}
+"Reproject the current sf data:"
+philly_WGS84 <- st_transform(PhilCrimes, 4326)
+
+pal_fun <- colorQuantile("YlOrRd", NULL, n = 5)
+
+p_popup <- paste0("<strong>Homicide Density: </strong>", philly_WGS84$homic_rate)
+
+# quantile breaks
+breaks_qt <- classIntervals(PhilCrimes$homic_rate, n = 7, style = "quantile")
+```
+
+**Making the actual map with Leaflet:**
+
+```{r}
+leaflet(philly_WGS84) %>%
+  addPolygons(
+    stroke = FALSE, 
+    fillColor = ~pal_fun(homic_rate),
+    fillOpacity = 0.8, smoothFactor = 0.5,
+    popup = p_popup,
+    group = "philly") %>%
+  addTiles(group = "OSM") %>%
+  addProviderTiles("CartoDB.DarkMatter", group = "Carto") %>%
+  addLegend("bottomright", 
+            colors = brewer.pal(7, "YlOrRd"), 
+            labels = paste0("up to ", format(breaks_qt$brks[-1], digits = 2)),
+            title = 'Philadelphia homicide density per sqkm') %>%
+  addLayersControl(baseGroups = c("OSM", "Carto"), 
+                   overlayGroups = c("philly"))
+```
+
+## Map Making with Tigris:
+
+### Shapefiles from Tigris:
+
+Tigris will return the shape files in the `sf` format, also known as `simple features`.
+
+The simple features data structure can be manipulated and viewed as a regular data frame.
+
+```{r}
+"Using the Tigris library:"
+USStates <- tigris::states(class = "sf")
+```
+
+The hard part is combining the geometric data and the tabular data.
+
+Luckily, the **Tigris** package has a function called `geo_join` to help you out.
+
+```{r}
+print(names(USStates))
+```
+
+```{r}
+head(PhilCrimes)
+```
+
+```{r}
+dfMerged <- geo_join(spatial_data = USStates, data_frame = PhilCrimes, "GEOID", "GEOID10")
+```
