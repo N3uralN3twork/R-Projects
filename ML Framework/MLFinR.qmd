@@ -1,0 +1,230 @@
+---
+title: "ML Framework in R"
+author: "Mathias Quinn"
+date: "5/22/2021"
+description: "The 2022 version of the 2019 machine learning framework project."
+toc: true
+toc-title: "Table of Contents"
+highlight-style: pygments
+format: 
+  html:
+    fig-width: 8
+    fig-height: 4
+    code-fold: true
+    code-line-numbers: true
+    linkcolor: "orange"
+---
+
+## Australian Weather
+
+### Import libraries
+
+```{r, results='hide', message=FALSE}
+library(readr)
+library(ggplot2)
+library(broom)
+library(tidymodels)
+library(discrim)
+```
+
+@fig-airquality further explores the impact of temperature on ozone level.
+
+```{r}
+#| label: fig-airquality
+#| fig-cap: Temperature and ozone level.
+#| warning: false
+
+library(ggplot2)
+
+ggplot(airquality, aes(Temp, Ozone)) + 
+  geom_point() + 
+  geom_smooth(method = "loess"
+)
+```
+
+::: {.callout-note collapse="true"}
+## Purpose
+
+This is an updated version of the original ML framework started in September of 2019.
+:::
+
+### Read in the Sea Urchin data
+
+```{r, results='hide', message=FALSE}
+urchins <-
+  # Data were assembled for a tutorial 
+  # at https://www.flutterbys.com.au/stats/tut/tut7.5a.html
+  read_csv("https://tidymodels.org/start/models/urchins.csv") %>% 
+  # Change the names to be a little more verbose
+  setNames(c("food_regime", "initial_volume", "width")) %>% 
+  # Factors are very helpful for modeling, so we convert one column
+  mutate(food_regime = factor(food_regime, levels = c("Initial", "Low", "High")))
+
+```
+
+Taking a high-level look at the data:
+
+```{r}
+head(urchins)
+```
+
+```{r}
+str(urchins)
+```
+
+The urchins data is a [tibble](https://tibble.tidyverse.org/index.html). For each of the $72$ urchins, we know their:
+
+-   experimental feeding regime group (`Initial`, `Low`, or `High`)
+
+-   size in millimeters at the start of the experiment (`initial_volume`)
+
+-   suture width at the end of the experiment (`width`)
+
+### Exploratory Data Analysis
+
+```{r}
+ggplot(urchins,
+       aes(x = initial_volume, 
+           y = width, 
+           group = food_regime, 
+           col = food_regime)) + 
+  geom_point() + 
+  geom_smooth(method = lm, se = FALSE) +
+  scale_color_viridis_d(option = "plasma", end = .7)
+```
+
+We can see that urchins that were larger in volume at the start of the experiment tended to have wider structures at the end, but the slopes of the lines look different so this effect may depend on the feeding regime condition.
+
+i.e. There's some interaction going on that should be noted for future modelling.
+
+### Build and Fit a Model
+
+A standard two-way analysis of variance ([ANOVA](https://www.itl.nist.gov/div898/handbook/prc/section4/prc43.htm)) model makes sense for this dataset because we have both a continuous predictor and a categorical predictor. Since the slopes appear to be different for at least two of the feeding regimes, let's build a model that allows for two-way interactions. Specifying an R formula with our variables in this way: `width ~ initial_volume * food_regime`
+
+allows our regression model depending on initial volume to have separate sloped and intercepts for each food regime.
+
+For this kind of model, OLS is a good initial approach. With **tidymodels**, we start by specifying the *functional form* of the model that we want using the [parsnip package](https://parsnip.tidymodels.org/). Since there is a numeric outcome and the model should be linear with slopes and intercepts, the model type is ["linear regression"](https://parsnip.tidymodels.org/reference/linear_reg.html). We can declare this with:
+
+```{r}
+linear_reg()
+```
+
+That is pretty underwhelming since, on its own, it doesn't really do much. However, now that the type of model has been specified, we can think about a method for *fitting* or training the model, the model **engine**. The engine value is often a mash-up of the software that can be used to fit or train the model as well as the estimation method. The default for `linear_reg()` is "lm" for ordinary least squares.
+
+You could set a non-default option instead:
+
+```{r}
+linear_reg() %>% 
+  set_engine("glm")
+```
+
+From here, you can train the model using the `fit()` function:
+
+```{r}
+lm_mod <- linear_reg()
+
+lm_fit <- 
+  lm_mod %>% 
+  fit(width ~ initial_volume * food_regime, data = urchins)
+
+lm_fit
+```
+
+Perhaps our analysis requires a description of the model parameter estimates and their statistical properties. Although the `summary()` function for `lm` objects can provide that, it gives the results back in an unwieldy format. Many models have a `tidy()` method that provides the summary results in a more predictable and useful format (e.g. a data frame with standard column names):
+
+```{r}
+tidy(lm_fit)
+```
+
+```{r}
+mars_disc_spec <-
+  discrim_flexible(prod_degree = tune()) %>%
+  set_engine("earth")
+
+reg_disc_spec <-
+  discrim_regularized(frac_common_cov = tune(), frac_identity = tune()) %>%
+  set_engine("klaR")
+
+dtree <- 
+  decision_tree(cost_complexity = tune(), min_n = tune()) %>%
+  set_engine("rpart") %>%
+  set_mode("classification")
+```
+
+```{r}
+data("parabolic")
+```
+
+Next, we'll need a resampling method. In this case we'll use the bootstrap.
+
+```{r}
+set.seed(42)
+train_resamples <- bootstraps(parabolic)
+```
+
+A workflow set takes a named list of pre-processors and named list of parsnip model specifications.
+
+# Parabolic Dataset
+
+::: callout-important
+## Model Specification
+
+This is where you specify the form of the model!
+:::
+
+```{r}
+all_workflows <- 
+  workflow_set(
+    preproc = list("formula" = class ~ .),
+    models = list(regularized = reg_disc_spec, mars = mars_disc_spec, dtree = dtree)
+  )
+
+all_workflows
+```
+
+#### Adding options to the models
+
+We can add any specific options that we think are important for tuning or resampling using the [`option_add()`](https://workflowsets.tidymodels.org/reference/option_add.html) function.
+
+For illustration, let's use the `extract` argument of the [control function](https://tune.tidymodels.org/reference/control_grid.html) to save the fitted workflow. We can then pick which workflow should use this option with the `id` argument:
+
+```{r}
+all_workflows <- 
+   all_workflows %>% 
+   option_add(id = "formula_cart", 
+              control = control_grid(extract = function(x) x))
+
+all_workflows
+```
+
+#### Tuning the models
+
+Since these models all have tuning parameters, we can apply the [`workflow_map()`](https://workflowsets.tidymodels.org/reference/workflow_map.html) function to execute grid search for each of these model-specific arguments. The default function to apply across the workflows is [`tune_grid()`](https://tune.tidymodels.org/reference/tune_grid.html) but other `tune_*()` functions and [`fit_resamples()`](https://tune.tidymodels.org/reference/fit_resamples.html) can be used by passing the function name as the first argument.
+
+Let's use the same grid size for each model. For the MARS model, there are only two possible tuning parameter values but [`tune_grid()`](https://tune.tidymodels.org/reference/tune_grid.html) is forgiving about our request of 20 parameter values.
+
+The `verbose` option provides a concise listing for which workflow is being processed:
+
+```{r}
+all_workflows <-
+  all_workflows %>%
+  workflow_map(resamples = train_resamples, grid = 10, verbose = TRUE)
+```
+
+Taking a look at our workflows:
+
+```{r}
+all_workflows
+```
+
+Ranking the results:
+
+```{r}
+rank_results(all_workflows, rank_metric = "roc_auc")
+```
+
+Plotting the results:
+
+```{r}
+autoplot(all_workflows, metric = "roc_auc")
+```

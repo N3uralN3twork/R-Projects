@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Mathias Quinn">
+<meta name="dcterms.date" content="2021-05-22">
+<meta name="description" content="The 2022 version of the 2019 machine learning framework project.">
+
+<title>ML Framework in R</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="MLFinR_files/libs/clipboard/clipboard.min.js"></script>
+<script src="MLFinR_files/libs/quarto-html/quarto.js"></script>
+<script src="MLFinR_files/libs/quarto-html/popper.min.js"></script>
+<script src="MLFinR_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="MLFinR_files/libs/quarto-html/anchor.min.js"></script>
+<link href="MLFinR_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="MLFinR_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="MLFinR_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="MLFinR_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="MLFinR_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of Contents</h2>
+   
+  <ul>
+  <li><a href="#australian-weather" id="toc-australian-weather" class="nav-link active" data-scroll-target="#australian-weather">Australian Weather</a>
+  <ul class="collapse">
+  <li><a href="#import-libraries" id="toc-import-libraries" class="nav-link" data-scroll-target="#import-libraries">Import libraries</a></li>
+  <li><a href="#read-in-the-sea-urchin-data" id="toc-read-in-the-sea-urchin-data" class="nav-link" data-scroll-target="#read-in-the-sea-urchin-data">Read in the Sea Urchin data</a></li>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis">Exploratory Data Analysis</a></li>
+  <li><a href="#build-and-fit-a-model" id="toc-build-and-fit-a-model" class="nav-link" data-scroll-target="#build-and-fit-a-model">Build and Fit a Model</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">ML Framework in R</h1>
+</div>
+
+<div>
+  <div class="description">
+    The 2022 version of the 2019 machine learning framework project.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Mathias Quinn </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 22, 2021</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<section id="australian-weather" class="level2">
+<h2 class="anchored" data-anchor-id="australian-weather">Australian Weather</h2>
+<section id="import-libraries" class="level3">
+<h3 class="anchored" data-anchor-id="import-libraries">Import libraries</h3>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(broom)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(tidymodels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><a href="#fig-airquality">Figure&nbsp;1</a> further explores the impact of temperature on ozone level.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb2-2"><a href="#cb2-2"></a></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="fu">ggplot</span>(airquality, <span class="fu">aes</span>(Temp, Ozone)) <span class="sc">+</span> </span>
+<span id="cb2-4"><a href="#cb2-4"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb2-5"><a href="#cb2-5"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-airquality" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="MLFinR_files/figure-html/fig-airquality-1.png" class="img-fluid figure-img" width="768"></p>
+<p></p><figcaption class="figure-caption">Figure 1: Temperature and ozone level.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Purpose
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>This is an updated version of the original ML framework started in September of 2019.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="read-in-the-sea-urchin-data" class="level3">
+<h3 class="anchored" data-anchor-id="read-in-the-sea-urchin-data">Read in the Sea Urchin data</h3>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>urchins <span class="ot">&lt;-</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>  <span class="co"># Data were assembled for a tutorial </span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>  <span class="co"># at https://www.flutterbys.com.au/stats/tut/tut7.5a.html</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>  <span class="fu">read_csv</span>(<span class="st">"https://tidymodels.org/start/models/urchins.csv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-5"><a href="#cb3-5"></a>  <span class="co"># Change the names to be a little more verbose</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a>  <span class="fu">setNames</span>(<span class="fu">c</span>(<span class="st">"food_regime"</span>, <span class="st">"initial_volume"</span>, <span class="st">"width"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-7"><a href="#cb3-7"></a>  <span class="co"># Factors are very helpful for modeling, so we convert one column</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a>  <span class="fu">mutate</span>(<span class="at">food_regime =</span> <span class="fu">factor</span>(food_regime, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Initial"</span>, <span class="st">"Low"</span>, <span class="st">"High"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Taking a high-level look at the data:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">head</span>(urchins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  food_regime initial_volume width
+  &lt;fct&gt;                &lt;dbl&gt; &lt;dbl&gt;
+1 Initial                3.5 0.01 
+2 Initial                5   0.02 
+3 Initial                8   0.061
+4 Initial               10   0.051
+5 Initial               13   0.041
+6 Initial               13   0.061</code></pre>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">str</span>(urchins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [72 × 3] (S3: tbl_df/tbl/data.frame)
+ $ food_regime   : Factor w/ 3 levels "Initial","Low",..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ initial_volume: num [1:72] 3.5 5 8 10 13 13 15 15 16 17 ...
+ $ width         : num [1:72] 0.01 0.02 0.061 0.051 0.041 0.061 0.041 0.071 0.092 0.051 ...</code></pre>
+</div>
+</div>
+<p>The urchins data is a <a href="https://tibble.tidyverse.org/index.html">tibble</a>. For each of the <span class="math inline">\(72\)</span> urchins, we know their:</p>
+<ul>
+<li><p>experimental feeding regime group (<code>Initial</code>, <code>Low</code>, or <code>High</code>)</p></li>
+<li><p>size in millimeters at the start of the experiment (<code>initial_volume</code>)</p></li>
+<li><p>suture width at the end of the experiment (<code>width</code>)</p></li>
+</ul>
+</section>
+<section id="exploratory-data-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data Analysis</h3>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">ggplot</span>(urchins,</span>
+<span id="cb8-2"><a href="#cb8-2"></a>       <span class="fu">aes</span>(<span class="at">x =</span> initial_volume, </span>
+<span id="cb8-3"><a href="#cb8-3"></a>           <span class="at">y =</span> width, </span>
+<span id="cb8-4"><a href="#cb8-4"></a>           <span class="at">group =</span> food_regime, </span>
+<span id="cb8-5"><a href="#cb8-5"></a>           <span class="at">col =</span> food_regime)) <span class="sc">+</span> </span>
+<span id="cb8-6"><a href="#cb8-6"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb8-7"><a href="#cb8-7"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a>  <span class="fu">scale_color_viridis_d</span>(<span class="at">option =</span> <span class="st">"plasma"</span>, <span class="at">end =</span> .<span class="dv">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="MLFinR_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+<p>We can see that urchins that were larger in volume at the start of the experiment tended to have wider structures at the end, but the slopes of the lines look different so this effect may depend on the feeding regime condition.</p>
+<p>i.e.&nbsp;There’s some interaction going on that should be noted for future modelling.</p>
+</section>
+<section id="build-and-fit-a-model" class="level3">
+<h3 class="anchored" data-anchor-id="build-and-fit-a-model">Build and Fit a Model</h3>
+<p>A standard two-way analysis of variance (<a href="https://www.itl.nist.gov/div898/handbook/prc/section4/prc43.htm">ANOVA</a>) model makes sense for this dataset because we have both a continuous predictor and a categorical predictor. Since the slopes appear to be different for at least two of the feeding regimes, let's build a model that allows for two-way interactions. Specifying an R formula with our variables in this way: <code>width ~ initial_volume * food_regime</code></p>
+<p>allows our regression model depending on initial volume to have separate sloped and intercepts for each food regime.</p>
+<p>For this kind of model, OLS is a good initial approach. With <strong>tidymodels</strong>, we start by specifying the <em>functional form</em> of the model that we want using the <a href="https://parsnip.tidymodels.org/">parsnip package</a>. Since there is a numeric outcome and the model should be linear with slopes and intercepts, the model type is <a href="https://parsnip.tidymodels.org/reference/linear_reg.html">"linear regression"</a>. We can declare this with:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">linear_reg</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear Regression Model Specification (regression)
+
+Computational engine: lm </code></pre>
+</div>
+</div>
+<p>That is pretty underwhelming since, on its own, it doesn't really do much. However, now that the type of model has been specified, we can think about a method for <em>fitting</em> or training the model, the model <strong>engine</strong>. The engine value is often a mash-up of the software that can be used to fit or train the model as well as the estimation method. The default for <code>linear_reg()</code> is “lm” for ordinary least squares.</p>
+<p>You could set a non-default option instead:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb12-2"><a href="#cb12-2"></a>  <span class="fu">set_engine</span>(<span class="st">"glm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear Regression Model Specification (regression)
+
+Computational engine: glm </code></pre>
+</div>
+</div>
+<p>From here, you can train the model using the <code>fit()</code> function:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>lm_mod <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>()</span>
+<span id="cb14-2"><a href="#cb14-2"></a></span>
+<span id="cb14-3"><a href="#cb14-3"></a>lm_fit <span class="ot">&lt;-</span> </span>
+<span id="cb14-4"><a href="#cb14-4"></a>  lm_mod <span class="sc">%&gt;%</span> </span>
+<span id="cb14-5"><a href="#cb14-5"></a>  <span class="fu">fit</span>(width <span class="sc">~</span> initial_volume <span class="sc">*</span> food_regime, <span class="at">data =</span> urchins)</span>
+<span id="cb14-6"><a href="#cb14-6"></a></span>
+<span id="cb14-7"><a href="#cb14-7"></a>lm_fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>parsnip model object
+
+
+Call:
+stats::lm(formula = width ~ initial_volume * food_regime, data = data)
+
+Coefficients:
+                   (Intercept)                  initial_volume  
+                     0.0331216                       0.0015546  
+                food_regimeLow                 food_regimeHigh  
+                     0.0197824                       0.0214111  
+ initial_volume:food_regimeLow  initial_volume:food_regimeHigh  
+                    -0.0012594                       0.0005254  </code></pre>
+</div>
+</div>
+<p>Perhaps our analysis requires a description of the model parameter estimates and their statistical properties. Although the <code>summary()</code> function for <code>lm</code> objects can provide that, it gives the results back in an unwieldy format. Many models have a <code>tidy()</code> method that provides the summary results in a more predictable and useful format (e.g.&nbsp;a data frame with standard column names):</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="fu">tidy</span>(lm_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  term                            estimate std.error statistic  p.value
+  &lt;chr&gt;                              &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)                     0.0331    0.00962      3.44  0.00100 
+2 initial_volume                  0.00155   0.000398     3.91  0.000222
+3 food_regimeLow                  0.0198    0.0130       1.52  0.133   
+4 food_regimeHigh                 0.0214    0.0145       1.47  0.145   
+5 initial_volume:food_regimeLow  -0.00126   0.000510    -2.47  0.0162  
+6 initial_volume:food_regimeHigh  0.000525  0.000702     0.748 0.457   </code></pre>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>mars_disc_spec <span class="ot">&lt;-</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a>  <span class="fu">discrim_flexible</span>(<span class="at">prod_degree =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a>  <span class="fu">set_engine</span>(<span class="st">"earth"</span>)</span>
+<span id="cb18-4"><a href="#cb18-4"></a></span>
+<span id="cb18-5"><a href="#cb18-5"></a>reg_disc_spec <span class="ot">&lt;-</span></span>
+<span id="cb18-6"><a href="#cb18-6"></a>  <span class="fu">discrim_regularized</span>(<span class="at">frac_common_cov =</span> <span class="fu">tune</span>(), <span class="at">frac_identity =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb18-7"><a href="#cb18-7"></a>  <span class="fu">set_engine</span>(<span class="st">"klaR"</span>)</span>
+<span id="cb18-8"><a href="#cb18-8"></a></span>
+<span id="cb18-9"><a href="#cb18-9"></a>dtree <span class="ot">&lt;-</span> </span>
+<span id="cb18-10"><a href="#cb18-10"></a>  <span class="fu">decision_tree</span>(<span class="at">cost_complexity =</span> <span class="fu">tune</span>(), <span class="at">min_n =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb18-11"><a href="#cb18-11"></a>  <span class="fu">set_engine</span>(<span class="st">"rpart"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb18-12"><a href="#cb18-12"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Next, we’ll need a resampling method. In this case we’ll use the bootstrap.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb19-2"><a href="#cb19-2"></a>train_resamples <span class="ot">&lt;-</span> <span class="fu">bootstraps</span>(urchins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>A workflow set takes a named list of pre-processors and named list of parsnip model specifications.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>all_workflows <span class="ot">&lt;-</span> </span>
+<span id="cb20-2"><a href="#cb20-2"></a>  <span class="fu">workflow_set</span>(</span>
+<span id="cb20-3"><a href="#cb20-3"></a>    <span class="at">preproc =</span> <span class="fu">list</span>(<span class="st">"formula"</span> <span class="ot">=</span> class <span class="sc">~</span> .),</span>
+<span id="cb20-4"><a href="#cb20-4"></a>    <span class="at">models =</span> <span class="fu">list</span>(<span class="at">regularized =</span> reg_disc_spec, <span class="at">mars =</span> mars_disc_spec, <span class="at">dtree =</span> dtree)</span>
+<span id="cb20-5"><a href="#cb20-5"></a>  )</span>
+<span id="cb20-6"><a href="#cb20-6"></a></span>
+<span id="cb20-7"><a href="#cb20-7"></a>all_workflows</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A workflow set/tibble: 3 × 4
+  wflow_id            info             option    result    
+  &lt;chr&gt;               &lt;list&gt;           &lt;list&gt;    &lt;list&gt;    
+1 formula_regularized &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+2 formula_mars        &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+3 formula_dtree       &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;</code></pre>
+</div>
+</div>
+<section id="adding-options-to-the-models" class="level4">
+<h4 class="anchored" data-anchor-id="adding-options-to-the-models">Adding options to the models</h4>
+<p>We can add any specific options that we think are important for tuning or resampling using the <a href="https://workflowsets.tidymodels.org/reference/option_add.html"><code>option_add()</code></a> function.</p>
+<p>For illustration, let's use the <code>extract</code> argument of the <a href="https://tune.tidymodels.org/reference/control_grid.html">control function</a> to save the fitted workflow. We can then pick which workflow should use this option with the <code>id</code> argument:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>all_workflows <span class="ot">&lt;-</span> </span>
+<span id="cb22-2"><a href="#cb22-2"></a>   all_workflows <span class="sc">%&gt;%</span> </span>
+<span id="cb22-3"><a href="#cb22-3"></a>   <span class="fu">option_add</span>(<span class="at">id =</span> <span class="st">"formula_cart"</span>, </span>
+<span id="cb22-4"><a href="#cb22-4"></a>              <span class="at">control =</span> <span class="fu">control_grid</span>(<span class="at">extract =</span> <span class="cf">function</span>(x) x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Don't have an 'id' value formula_cart</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>all_workflows</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A workflow set/tibble: 3 × 4
+  wflow_id            info             option    result    
+  &lt;chr&gt;               &lt;list&gt;           &lt;list&gt;    &lt;list&gt;    
+1 formula_regularized &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+2 formula_mars        &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+3 formula_dtree       &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="tuning-the-models" class="level4">
+<h4 class="anchored" data-anchor-id="tuning-the-models">Tuning the models</h4>
+<p>Since these models all have tuning parameters, we can apply the <a href="https://workflowsets.tidymodels.org/reference/workflow_map.html"><code>workflow_map()</code></a> function to execute grid search for each of these model-specific arguments. The default function to apply across the workflows is <a href="https://tune.tidymodels.org/reference/tune_grid.html"><code>tune_grid()</code></a> but other <code>tune_*()</code> functions and <a href="https://tune.tidymodels.org/reference/fit_resamples.html"><code>fit_resamples()</code></a> can be used by passing the function name as the first argument.</p>
+<p>Let's use the same grid size for each model. For the MARS model, there are only two possible tuning parameter values but <a href="https://tune.tidymodels.org/reference/tune_grid.html"><code>tune_grid()</code></a> is forgiving about our request of 20 parameter values.</p>
+<p>The <code>verbose</code> option provides a concise listing for which workflow is being processed:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>all_workflows <span class="ot">&lt;-</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a>  all_workflows <span class="sc">%&gt;%</span></span>
+<span id="cb26-3"><a href="#cb26-3"></a>  <span class="fu">workflow_map</span>(<span class="at">resamples =</span> train_resamples, <span class="at">grid =</span> <span class="dv">20</span>, <span class="at">verbose =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>i 1 of 3 tuning:     formula_regularized</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✖ 1 of 3 tuning:     formula_regularized failed with: ! parsnip could not locate an implementation for `discrim_regularized`  model specifications using the `klaR` engine.ℹ The parsnip extension package discrim implements support for this  specification.ℹ Please install (if needed) and load to continue.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i 2 of 3 tuning:     formula_mars</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✖ 2 of 3 tuning:     formula_mars failed with: ! parsnip could not locate an implementation for `discrim_flexible`  model specifications using the `earth` engine.ℹ The parsnip extension package discrim implements support for this  specification.ℹ Please install (if needed) and load to continue.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>i 3 of 3 tuning:     formula_dtree</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap01: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap02: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap03: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap04: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap05: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap06: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap07: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap08: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap09: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap10: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap11: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap12: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap13: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap14: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap15: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap16: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap17: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap18: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap19: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap20: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap21: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap22: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap23: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap24: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>x Bootstrap25: preprocessor 1/1:
+  Error in `get_all_outcomes()`:
+  ! The following outcomes were not found in `data`: 'class'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: All models failed. Run `show_notes(.Last.tune.result)` for more
+information.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Unknown or uninitialised column: `.notes`.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✖ 3 of 3 tuning:     formula_dtree failed with </code></pre>
+</div>
+</div>
+<p>Taking a look at our workflows:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1"></a>all_workflows</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A workflow set/tibble: 3 × 4
+  wflow_id            info             option    result        
+  &lt;chr&gt;               &lt;list&gt;           &lt;list&gt;    &lt;list&gt;        
+1 formula_regularized &lt;tibble [1 × 4]&gt; &lt;opts[2]&gt; &lt;try-errr [1]&gt;
+2 formula_mars        &lt;tibble [1 × 4]&gt; &lt;opts[2]&gt; &lt;try-errr [1]&gt;
+3 formula_dtree       &lt;tibble [1 × 4]&gt; &lt;opts[2]&gt; &lt;tune[x]&gt;     </code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
