@@ -81,7 +81,7 @@ $$
 ## Table of Tests and Functions
 
 | ID  | Name of Test               | In R?   | Package     | Function             |
-|---------------|---------------|---------------|---------------|---------------|
+|-----|----------------------------|---------|-------------|----------------------|
 | 1   | One Mean t-test            | Yes     | pwr         | pwr.t.test           |
 | 2   | Two Means t-test           | Yes     | pwr         | pwr.t.test           |
 | 3   | Paired t-test              | Yes     | pwr         | pwr.t.test           |
