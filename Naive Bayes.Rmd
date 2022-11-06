@@ -93,9 +93,6 @@ train %>%
 ## **Advantages and Shortcoming**
 
 The Naive Bayes classifier is simple, fast, and scales well to large n.
-```{r}
-
-```
 
 A major disadvantage is that it relies on the often-wrong assumption of equally important and independent features.
 

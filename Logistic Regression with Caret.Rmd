@@ -15,7 +15,7 @@ output: html_document
 * Logistic Regression is suited for categorical response variables and one or more predictor variables.
 * $Log(Odds) = \beta1*X1+...\beta N*Xn$
 * The log(odds) ratio is $ln[p/(1-p)]$
-* Predicted probability of an event occuring: $p = 1/(1+\exp^{-z})$
+* Predicted probability of an event occurring: $p = 1/(1+\exp^{-z})$
 
 
 This project will be using the *German Credit* dataset from the caret package. Goal is to predict whether a consumer is good or bad for business.
